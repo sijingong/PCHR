@@ -1,0 +1,108 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span> <span class="sr-only">Close</span>
+            </div>
+            <h4 class="modal-title">添加二级菜单</h4>
+        </div>
+        <div class="modal-body" id="modalbody" roller="false"
+             style="width: 90%; position: relative; overflow-x: hidden; overflow-y: auto;margin-left: auto;margin-right: auto;">
+            <form action="#" method="post" id="createSubMenuForm">
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2" style="text-align: right;">所属父菜单:</label>
+                        <div class="col-sm-3">
+                            <button id="supMenuInfoBut" type="button" class="btn btn-info"></button>
+                        </div>
+                        <div class="col-sm-1">
+                            <span style="color:rgb(255,0,0)">*</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2" style="text-align: right;">菜单名称</label>
+                        <div class="col-sm-3">
+                            <input id="menuName" class="form-control" type="text" name="menuName"/>
+                        </div>
+                        <div class="col-sm-1">
+                            <span style="color:rgb(255,0,0)">*</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2" style="text-align: right;">菜单URL</label>
+                        <div class="col-sm-3">
+                            <input id="url" class="form-control" type="text" name="url"/>
+                        </div>
+                        <div class="col-sm-1">
+                            <span style="color:rgb(255,0,0)">*</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2" style="text-align: right;">备注</label>
+                        <div class="col-sm-3">
+                             <textarea id="remark" placeholder="请输入备注" name="remark" autocomplete="off"
+                                       class="form-control"></textarea>
+                        </div>
+                        <div class="col-sm-1">
+                            <span style="color:rgb(255,0,0)">*</span>
+                        </div>
+                    </div>
+                    <input type="hidden" id="pMenuId" name="pMenuId"/>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <div class="btn btn-default" data-dismiss="modal" id="dialogng">关闭</div>
+                <button type="button" class="btn btn-primary" id="submit_button" onclick="createSubMenu()">
+                    <span>添加二级菜单</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    /**
+     * 创建二级菜单
+     */
+    function createSubMenu() {
+        if (!window.confirm('确定要添加二级菜单吗?')) {
+            return;
+        }
+        //获取表单数据
+        let formData = $('#createSubMenuForm').serialize();
+        console.info(formData);
+        //利用AJAX以form表单post方式请求提交数据
+        $.ajax({
+            url: '/menu/create',
+            type: 'post',
+            data: formData,
+            contextType: 'application/x-www-form-urlencoded',// 在发送前对所有字符进行编码
+            dataType: 'json',
+            success: function (jsonData) {
+                if (0 != jsonData.status) {
+                    alert(`添加二级菜单失败【${jsonData.message}】`);
+                    return;
+                }
+                var rows = jsonData.data;
+                if (1 == rows) {
+                    alert('添加二级菜单成功!!');
+                    //隐藏模态框
+                    $("#supMenuModal").hide();
+                    window.location.reload();//刷新页面
+                } else {
+                    alert('添加二级菜单,服务器返回未知操作状态!');
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert(`添加二级菜单失败【${errorThrown || textStatus}】`);
+            }
+        });
+    }
+
+</script>

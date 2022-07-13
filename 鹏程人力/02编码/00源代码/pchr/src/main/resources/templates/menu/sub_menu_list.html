@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>系统菜单列表-二级菜单</title>
+    <style type="text/css">
+        #subMenuModal .modal-dialog {
+            width: 900px;
+        }
+
+    </style>
+    <link rel="stylesheet" href="/static/js/bootstrap/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="/static/js/bootstrap/css/bootstrap-theme.min.css" type="text/css"/>
+    <link rel="stylesheet" href="/static/js/bootstrap/datetimepicker/css/bootstrap-datetimepicker.min.css">
+    <script type="text/javascript" src="/static/js/bootstrap/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap/datetimepicker/js/bootstrap-datetimepicker.zh-CN.js"></script>
+    <script type="text/javascript" src="/static/js/util/common.js"></script>
+</head>
+
+<body>
+<ol class="breadcrumb">
+    <li>当前位置:二级菜单列表</li>
+</ol>
+<div class="container-fluid" style="padding-left: 0px;">
+    <div class="well">
+        <form action="/menu/query_list" method="post">
+            <div class="form-group" style="width: 100%">
+                <div class="row">
+                    <div class="col-sm-2">
+                        <span>菜单状态:</span>
+                    </div>
+                    <div class="col-sm-3" >
+                        <select id="useStateSelect" class="form-control" name="useState">
+                            <option value="9">全部</option>
+                            <option value="1">使用中</option>
+                            <option value="0">已停用</option>
+                        </select>
+                        <script th:inline="javascript">
+                            let useState=[[${param.useState!=null?param.useState[0]:9}]];
+                            $('#useStateSelect').val(useState);
+                        </script>
+                    </div>
+                    <div class="col-sm-2">
+                        <span>所属一级菜单:</span>
+                    </div>
+                    <div class="col-sm-3" >
+                        <select id="pMenuSelect"  class="form-control" name="pMenuId" >
+                        </select>
+                    </div>
+                    <div>
+                        <input type="hidden" name="menuLevel" value="2">
+                        <button type="submit" class="btn btn-primary" title="查询二级菜单"><span class="glyphicon glyphicon-search"></span></button>
+                        <button type="button" class="btn btn-primary" title="添加二级菜单" onclick="showAddSupMenuDialog()"><span class="glyphicon glyphicon-plus"></span></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="scrollContent" style="width: 99%">
+    <table class="table table-hover table-striped table-bordered">
+        <thead>
+        <tr class="info">
+        <tr>
+            <th class="text-center">菜单名称</th>
+            <th class="text-center">菜单URL</th>
+            <th class="text-center">菜单级别</th>
+            <th class="text-center">菜单索引</th>
+            <th class="text-center">菜单状态</th>
+            <th class="text-center">创建时间</th>
+            <th class="text-center">操作</th>
+        </tr>
+        </tr>
+        </thead>
+        <tbody th:if="${#lists.isEmpty(menuList)}">
+        <tr>
+            <td style="color: #0000ff;text-align: center" colspan="7">未查询到二级系统菜单数据</td>
+        </tr>
+        </tbody>
+        <tbody th:if="${#lists.size(menuList)>0}" th:each="menu:${menuList}">
+        <tr>
+            <td th:text="${menu.menuName}"></td>
+            <td th:text="${menu.url}"></td>
+            <td>二级</td>
+            <td th:text="${menu.menuIndex}"></td>
+            <td th:switch="${menu.useState}">
+                <span th:case="1">使用中</span>
+                <span th:case="0">已停用</span>
+                <span th:case="*">未知</span>
+            </td>
+            <td th:text="${#dates.format(menu.createTime,'yyyy-MM-dd HH:mm:ss')}"></td>
+
+            <td th:data-name="${menu.menuName}" th:data-id="${menu.menuId}">
+                <button type="button" class="btn btn-danger btn-sm" title="删除二级菜单" onclick="removeMenu(this)">
+                    <span class="glyphicon glyphicon-remove"></span>
+                </button>
+                <button type="button" class="btn bg-primary btn-sm" title="修改二级菜单" onclick="showModifySupMenuDialog(this)">
+                    <span class="glyphicon glyphicon-edit"></span>
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <script>
+        /**
+         * 删除二级菜单
+         * @param but
+         */
+        function removeMenu(but) {
+            var menuName = $(but).parent().data("name");
+            if (!window.confirm(`确定要删除二级菜单【${menuName}】吗?`)) {
+                return;
+            }
+            var menuId = $(but).parent().data("id");
+            //发送异步请求删除二级菜单
+            $.ajax({
+                url: '/menu/remove',
+                type: 'get',
+                data: {'menuId': menuId},
+                dataType: 'json',
+                success: function (jsonData) {
+                    if (0 != jsonData.status) {
+                        alert(`删除二级菜单失败【${jsonData.message}】`);
+                        return;
+                    }
+                    var rows = jsonData.data;
+                    if (1 == rows) {
+                        alert('删除二级菜单成功!!');
+                        window.location.reload();
+                        return;
+                    }
+                    if (0 == rows) {
+                        alert('二级菜单不存在或已被删除')
+                    } else {
+                        alert('删除二级菜单,服务器返回未知操作状态!');
+                    }
+                },
+                error:function(XMLHttpRequest, textStatus, errorThrown){
+                    alert(`删除二级菜单失败【${errorThrown||textStatus}】`);
+                }
+            });
+        }
+
+        /**
+         *  打开添加二级菜单模态框
+         */
+        function showAddSupMenuDialog() {
+            $.ajax({
+                type: 'get',
+                url: '/v/menu/create_sub_menu',
+                dataType: 'html',
+                success: function (data) {
+                    $("#subMenuModal").html(data);
+                    $("#subMenuModal").modal();
+                    let pMenuId = $('#pMenuSelect').val();
+                    let pMenuName = $('#pMenuSelect :selected').text();
+                    $('#supMenuInfoBut').text(pMenuName);
+                    $('#pMenuId').val(pMenuId);
+                },
+                error: function () {
+                }
+            });
+        }
+
+        /**
+         *  打开修改二级菜单模态框
+         */
+        function showModifySupMenuDialog(but) {
+            var menuId = $(but).parent().data("id");
+            $.ajax({
+                type: 'get',
+                url: '/v/menu/modify_sub_menu',
+                data:{'menuId':menuId},
+                dataType: 'html',
+                success: function (data) {
+                    $("#subMenuModal").html(data);
+                    $("#subMenuModal").modal();
+                    let pMenuId = $('#pMenuSelect').val();
+                    let pMenuName = $('#pMenuSelect :selected').text();
+                    $('#supMenuInfoBut').text(pMenuName);
+                    $('#pMenuId').val(pMenuId);
+                },
+                error: function () {
+                }
+            });
+        }
+    </script>
+    <script th:inline="javascript">
+        //加载一级菜单数据
+        $.ajax({
+            url: '/menu/list_data',
+            type: 'POST',
+            data: {menuLevel: 1},
+            dataType: 'json',
+            success: function (jsonData) {
+                let status = jsonData.status;
+                if (0 != status) {
+                    alert(`加载二级菜单数据失败,原因:${jsonData.message}`);
+                    return;
+                }
+                let menuList = jsonData.data;
+                for (let menu of menuList) {
+                    $('#pMenuSelect').append(`<option value="${menu.menuId}">${menu.menuName}</option>`);
+                }
+                let pMenuId = [[${param.pMenuId!=null?param.pMenuId[0]:9}]];
+                $('#pMenuSelect').val(pMenuId);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert(`加载二级菜单失败,原因:${textStatus || errorThrown}`);
+            }
+        });
+    </script>
+</div>
+<div>
+    <!-- Modal -->
+    <div class="modal fade" id="subMenuModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    </div>
+</div>
+</body>
+
+</html>

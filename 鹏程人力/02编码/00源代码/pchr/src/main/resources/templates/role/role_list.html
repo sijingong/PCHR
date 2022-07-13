@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>角色管理-角色查询</title>
+    <style type="text/css">
+        #roleModal .modal-dialog {
+            width: 1000px;
+        }
+
+    </style>
+    <link rel="stylesheet" href="/static/js/bootstrap/css/bootstrap.min.css" type="text/css"/>
+    <link rel="stylesheet" href="/static/js/bootstrap/css/bootstrap-theme.min.css" type="text/css"/>
+    <link rel="stylesheet" href="/static/js/bootstrap/datetimepicker/css/bootstrap-datetimepicker.min.css">
+    <script type="text/javascript" src="/static/js/bootstrap/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap/datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap/datetimepicker/js/bootstrap-datetimepicker.zh-CN.js"></script>
+    <script type="text/javascript" src="/static/js/util/common.js"></script>
+</head>
+
+<body style="height: 628px">
+<ol class="breadcrumb">
+    <li>当前位置:角色列表</li>
+</ol>
+<div class="container-fluid" style="padding-left: 0px;">
+    <div class="well">
+        <form action="/role/query" method="post">
+            <div class="form-group" style="width: 100%">
+                <div class="row">
+                    <div>
+                        <button type="submit" class="btn btn-primary" title="查询角色"><span class="glyphicon glyphicon-search"></span></button>
+                        <button type="button" class="btn btn-primary" title="添加角色" onclick="showAddRoleDialog()"><span class="glyphicon glyphicon-plus"></span></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="scrollContent" style="width: 99%">
+    <table class="table table-hover table-striped table-bordered">
+        <thead>
+        <tr class="info">
+        <tr>
+            <th class="text-center">角色中文名</th>
+            <th class="text-center">角色英文名</th>
+            <th class="text-center">数量上限</th>
+            <th class="text-center">状态</th>
+            <th>操作</th>
+        </tr>
+        </tr>
+        </thead>
+        <tbody th:if="${#lists.isEmpty(roleList)}">
+        <tr>
+            <td style="color: #0000ff;text-align: center" colspan="5">未查询到任何角色角色数据</td>
+        </tr>
+        </tbody>
+        <tbody th:if="${#lists.size(roleList)>0}" th:each="role:${roleList}">
+        <tr>
+            <td th:text="${role.roleNameZh}"></td>
+            <td th:text="${role.roleNameEn}"></td>
+            <td th:text="${role.maxCount}"></td>
+            <td th:switch="${role.useState}" >
+                <span th:case="1" style="color: blue">已启用</span>
+                <span th:case="0" style="color: red">已停用</span>
+                <span th:case="*">未知</span>
+            </td>
+            <td th:data-name="${role.roleNameZh}" th:data-id="${role.roleId}">
+                <button type="button" class="btn btn-success btn-sm" title="设置角色菜单" onclick="showSetRoleMenusDialog(this)">
+                    <span class="glyphicon glyphicon-cog"></span>
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" title="删除角色" onclick="removeRole(this)">
+                    <span class="glyphicon glyphicon-remove"></span>
+                </button>
+                <button type="button" class="btn bg-primary btn-sm" title="修改角色" onclick="showModifyRoleDialog(this)">
+                    <span class="glyphicon glyphicon-edit"></span>
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <script>
+        /**
+         * 删除角色
+         * @param but
+         */
+        function removeRole(but) {
+            let roleName = $(but).parent().data("name");
+            if (!window.confirm(`确定要删除角色【${roleName}】吗?`)) {
+                return;
+            }
+            let roleId = $(but).parent().data("id");
+            //发送异步请求删除角色
+            $.ajax({
+                url: '/role/remove',
+                type: 'get',
+                data: {'roleId': roleId},
+                dataType: 'json',
+                success: function (jsonData) {
+                    if (0 != jsonData.status) {
+                        alert(`删除角色失败【${jsonData.message}】`);
+                        return;
+                    }
+                    let  rows = jsonData.data;
+                    if (1 == rows) {
+                        alert('删除成功!!');
+                        window.location.reload();
+                        return;
+                    }
+                    if (0 == rows) {
+                        alert('角色不存在或已被删除')
+                    } else {
+                        alert('删除角色,服务器返回未知操作状态!');
+                    }
+                },
+                error:function(XMLHttpRequest, textStatus, errorThrown){
+                    alert(`删除角色失败【${errorThrown||textStatus}】`);
+                }
+            });
+        }
+
+        /**
+         *  打开添加角色模态框
+         */
+        function showAddRoleDialog() {
+            $.ajax({
+                type: 'get',
+                url: '/v/role/create_role',
+                dataType: 'html',
+                success: function (data) {
+                    console.info(data);
+                    $("#roleModal").html(data);
+                    $("#roleModal").modal();
+                },
+                error: function () {
+                }
+            });
+        }
+
+        /**
+         *  打开修改角色模态框
+         */
+        function showModifyRoleDialog(but) {
+            var roleId = $(but).parent().data("id");
+            $.ajax({
+                type: 'get',
+                url: '/v/role/modify_role',
+                data:{'roleId':roleId},
+                dataType: 'html',
+                success: function (data) {
+                    $("#roleModal").html(data);
+                    $("#roleModal").modal();
+                },
+                error: function () {
+                }
+            });
+        }
+
+        /**
+         *  打开设置角色菜单页面
+         */
+        function showSetRoleMenusDialog(but) {
+            var roleId = $(but).parent().data("id");
+            $.ajax({
+                type: 'get',
+                url: '/role/menu_perm',
+                data:{'roleId':roleId},
+                dataType: 'html',
+                success: function (data) {
+                    $("#roleModal").html(data);
+                    $("#roleModal").modal();
+                },
+                error: function () {
+                }
+            });
+        }
+    </script>
+</div>
+<div>
+    <!-- Modal -->
+    <div class="modal fade" id="roleModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    </div>
+</div>
+</body>
+
+</html>

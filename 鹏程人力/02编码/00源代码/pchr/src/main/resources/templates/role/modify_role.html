@@ -1,0 +1,148 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span> <span class="sr-only">Close</span>
+            </div>
+            <h4 class="modal-title">修改角色</h4>
+        </div>
+        <div class="modal-body" id="modalbody" roller="false"
+             style="width: 90%; position: relative; overflow-x: hidden; overflow-y: auto;margin-left: auto;margin-right: auto;">
+            <form action="#" method="post" id="modifyDepForm">
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2" style="text-align: right;">角色中文名</label>
+                        <div class="col-sm-3">
+                            <input id="roleNameZh" class="form-control" type="text" name="roleNameZh"/>
+                        </div>
+                        <div class="col-sm-1">
+                            <span style="color:rgb(255,0,0)">*</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2" style="text-align: right;">角色英文名</label>
+                        <div class="col-sm-3">
+                            <input id="roleNameEn" class="form-control" type="text" name="roleNameEn"/>
+                        </div>
+                        <div class="col-sm-1">
+                            <span style="color:rgb(255,0,0)">*</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2" style="text-align: right;">数量上限</label>
+                        <div class="col-sm-3">
+                            <input type="number" id="max_count" min="0" name="maxCount" class="form-control"
+                                   required="">
+                        </div>
+                        <div class="col-sm-5">
+                            <span style="color:rgb(255,0,0)">*(0:数量不限)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2" style="text-align: right;">使用状态</label>
+                        <div class="col-sm-3">
+                            <label><input type="radio" name="useState" value="1" title="使用中">使用</label>
+                            <label><input type="radio" name="useState" value="0" title="已停用">已停</label>
+                        </div>
+                        <div class="col-sm-1">
+                            <span style="color:rgb(255,0,0)">*</span>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" name="roleId" th:value="${param.roleId}">
+            </form>
+            <div class="modal-footer">
+                <div class="btn btn-default" data-dismiss="modal" id="dialogng">关闭</div>
+                <button type="button" class="btn btn-primary" id="submit_button" onclick="modifyDep()">
+                    <span>修改角色</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        //当网页加载完成后执行
+    });
+    $(function () {
+        var roleId = [[${param.roleId!=null?param.roleId[0]:0}]];
+        if (0 == roleId) {
+            alert('缺少角色ID');
+            //隐藏模态框
+            $("#roleModal").hide();
+            return;
+        }
+        //加载角色信息
+        $.ajax({
+            url: '/role/load',
+            type: 'get',
+            data: {roleId: roleId},
+            dataType: 'json',
+            success: function (jsonData) {
+                let status = jsonData.status;
+                if (0 != status) {
+                    alert(`加载角色数据失败,原因:${jsonData.message}`);
+                    return;
+                }
+                //保存原始数据
+                role = jsonData.data;
+                //初始化修改角色表单数据
+                $(':text[name="roleNameZh"]').val(role.roleNameZh);
+                $(':text[name="roleNameEn"]').val(role.roleNameEn);
+                $(':input[name="maxCount"]').val(role.maxCount);
+                $(`:radio[name="useState"][value="${role.useState}"]`).prop({checked: true});
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert(`加载角色数据失败,原因:${textStatus || errorThrown}`);
+            }
+        });
+    });
+
+
+    /**
+     * 修改角色
+     */
+    function modifyDep() {
+        if (!window.confirm('确定要修改角色吗?')) {
+            return;
+        }
+        let formData = getDatas('modifyDepForm');
+        if (!isUpdated(formData, role, 'roleId')) {
+            alert('您没有对数据做任何修改');
+            return;
+        }
+        $.ajax({
+            url: '/role/modify',
+            type: 'post',
+            data: formData,
+            contextType: 'application/x-www-form-urlencoded',
+            dataType: 'json',
+            success: function (jsonData) {
+                if (0 != jsonData.status) {
+                    alert(`修改角色失败【${jsonData.message}】`);
+                    return;
+                }
+                let rows = jsonData.data;
+                if (1 == rows) {
+                    alert('修改角色成功!!');
+                    //隐藏模态框
+                    $("#roleModal").hide();
+                    window.location.reload();//刷新页面
+                } else if (0 == rows) {
+                    alert('角色不存在或已被删除!');
+                } else {
+                    alert('修改角色,服务器返回未知操作状态!');
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert(`修改角色失败【${errorThrown || textStatus}】`);
+            }
+        });
+    }
+</script>

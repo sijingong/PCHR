@@ -1,0 +1,93 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span> <span class="sr-only">Close</span>
+            </div>
+            <h4 class="modal-title">添加角色</h4>
+        </div>
+        <div class="modal-body" id="modalbody" roller="false"
+             style="width: 90%; position: relative; overflow-x: hidden; overflow-y: auto;margin-left: auto;margin-right: auto;">
+            <form action="#" method="post" id="createRoleForm">
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2" style="text-align: right;">角色中文名</label>
+                        <div class="col-sm-3">
+                            <input id="roleNameZh" class="form-control" type="text" name="roleNameZh"/>
+                        </div>
+                        <div class="col-sm-1">
+                            <span style="color:rgb(255,0,0)">*</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2" style="text-align: right;">角色英文名</label>
+                        <div class="col-sm-3">
+                            <input id="roleNameEn" class="form-control" type="text" name="roleNameEn"/>
+                        </div>
+                        <div class="col-sm-1">
+                            <span style="color:rgb(255,0,0)">*</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2" style="text-align: right;">数量上限</label>
+                        <div class="col-sm-3">
+                            <input type="number" id="max_count" min="0" name="maxCount" class="form-control" required="">
+                        </div>
+                        <div class="col-sm-5">
+                            <span style="color:rgb(255,0,0)">*(0:数量不限)</span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <div class="btn btn-default" data-dismiss="modal" id="dialogng">关闭</div>
+                <button type="button" class="btn btn-primary" id="submit_button" onclick="createRole()">
+                    <span>添加角色</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    /**
+     * 创建角色
+     */
+    function createRole() {
+        if (!window.confirm('确定要添加角色吗?')) {
+            return;
+        }
+        //获取表单数据
+        var formData = $('#createRoleForm').serialize();
+        //利用AJAX以form表单post方式请求提交数据
+        $.ajax({
+            url: '/role/create',
+            type: 'post',
+            data: formData,
+            contextType: 'application/x-www-form-urlencoded',// 在发送前对所有字符进行编码
+            dataType: 'json',
+            success: function (jsonData) {
+                if (0 != jsonData.status) {
+                    alert(`添加角色失败【${jsonData.message}】`);
+                    return;
+                }
+                var rows = jsonData.data;
+                if (1 == rows) {
+                    alert('添加角色成功!!');
+                    //隐藏模态框
+                    $("#roleModal").hide();
+                    window.location.reload();//刷新页面
+                } else {
+                    alert('添加角色,服务器返回未知操作状态!');
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert(`添加角色失败【${errorThrown || textStatus}】`);
+            }
+        });
+    }
+
+</script>

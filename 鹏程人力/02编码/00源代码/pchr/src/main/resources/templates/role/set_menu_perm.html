@@ -1,0 +1,85 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span> <span class="sr-only">Close</span>
+            </div>
+            <h4 class="modal-title">设置角色菜单</h4>
+        </div>
+        <div class="modal-body" roller="false"
+             style="width: 100%; position: relative; overflow-x: hidden; overflow-y: auto;margin-left: auto;margin-right: auto;">
+            <div th:if="${not #lists.isEmpty(menuPermList)}">
+                <form action="#" method="post">
+                    <div class="form-group" th:each="menuPerm:${menuPermList}"
+                         th:switch="${#lists.isEmpty(menuPerm.menuPerms)}">
+                        <div class="row">
+                            <label class="control-label col-md-2" th:text="${menuPerm.menu.menuName}"></label>
+                            <div class="col-md-3" th:case="true">
+                                <span style="color: #0000FF">暂无二级菜单权限</span>
+                            </div>
+                            <div class="col-md-10" th:case="false">
+                                <div class="col-md-3" th:each="subMenuPerm:${menuPerm.menuPerms}">
+                                    <label class="radio-inline">
+                                        <input type="checkbox" name="menu"
+                                               th:value="${subMenuPerm.menu.menuId}"
+                                               th:checked="${subMenuPerm.currentRoleId!=null?true:false}">
+                                        <span th:text="${subMenuPerm.menu.menuName}"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div th:if="${ #lists.isEmpty(menuPermList)}">
+                <span style="color:#ff0000">未查询到任何菜单权限数据</span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="btn btn-default" data-dismiss="modal">关闭</div>
+            <button type="button" class="btn btn-primary" onclick="setMenuPerm()">
+                <span>设置角色菜单</span>
+            </button>
+        </div>
+    </div>
+</div>
+<script th:inline="javascript">
+    /**
+     * 设置菜单权限
+     */
+    function setMenuPerm() {
+        let menuIds = [];
+        $(':checkbox[name="menu"]:checked').each(function (i) {
+            let menuId = this.value;
+            menuIds.push(menuId);
+        });
+        if (0 == menuIds.length) {
+            alert('未选择任何菜单权限');
+            return;
+        }
+        let roleId = [[${param.roleId!=null?param.roleId[0]:0}]];
+        $.ajax({
+            url: '/perm/set_menu_perm',
+            type: 'POST',
+            data: {roleId: roleId, menuIds: menuIds},
+            traditional: true,
+            dataType: 'json',
+            success: function (jsonData) {
+                let status = jsonData.status;
+                if (0 != status) {
+                    alert(`设置角色菜单(权限)失败,原因:${jsonData.message}`);
+                    return;
+                }
+                let rows = jsonData.data;
+                if (rows == menuIds.length) {
+                    alert('设置角色菜单(权限)成功!!')
+                } else {
+                    alert(`设置角色菜单(权限)失败,服务器返回未知状态`);
+                }
+
+            }, error: function (XMLHttpRequest, statusText, error) {
+                alert(`设置角色菜单(权限)失败,原因:${statusText || error}`);
+            }
+        });
+    }
+</script>
