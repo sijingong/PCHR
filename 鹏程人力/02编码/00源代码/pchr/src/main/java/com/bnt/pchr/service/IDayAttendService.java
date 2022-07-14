@@ -51,12 +51,19 @@ public interface IDayAttendService {
     int delete(DayAttend dayAttend);
 
    /**
-    * 添加
+    * 添加上下班打卡记录
     *
     * @param  dayAttend
     * @return
     */
     int insert(DayAttend dayAttend);
+
+    /**
+     * 添加补卡记录
+     * @param dayAttend
+     * @return
+     */
+    int compensateCard(DayAttend dayAttend);
     
    /**
     * 根据ID修改

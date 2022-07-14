@@ -14,6 +14,8 @@ import org.apache.ibatis.type.Alias;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+
 /**
 * Author bnt
 * Date  2022-07-13 16:05:22
@@ -42,7 +44,7 @@ public class DayAttend implements Serializable {
     @TableField(value = "supp_emp_id")
     private Integer suppEmpId;
 
-    @ApiModelProperty(value = "打卡状态（1:正常;2:迟到;3:早退;4:补卡）")
+    @ApiModelProperty(value = "打卡状态（1:上班正常;2:迟到;3:早退;4:补卡;5:超时打卡,6:下班正常）")
     @TableField(value = "attend_state")
     private Integer attendState;
 
@@ -54,4 +56,7 @@ public class DayAttend implements Serializable {
     @TableField(value = "supp_time")
     private Date suppTime;
 
+    @ApiModelProperty(value = "下班时间")
+    @TableField(value = "end_time")
+    private Date endTime;
 }
