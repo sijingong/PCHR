@@ -44,7 +44,7 @@ public class DayAttendController {
     public ResponseData insertCompensate(DayAttend dayAttend){
         int rows=dayAttendService.compensateCard(dayAttend);
         if(rows==9){
-            return ResponseData.FAIL(10035,"您的补卡此处已超过3次，不可以再补卡");
+            return ResponseData.FAIL(10035,"您的补卡次数已超过3次，不可以再补卡");
         }
         return ResponseData.SUCCESS(rows);
     }
