@@ -3,4 +3,70 @@
         PUBLIC "-//mybatis.org//DTD Mapper3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.bnt.pchr.mapper.EmpMapper">
+    <select id="selectPage" resultType="com.bnt.pchr.entity.Emp">
+        SELECT
+            `emp_id`,
+            `emp_name`,
+            `password`,
+            `emp_no`,
+            `sex`,
+            `mobile`,
+            `emp_state`,
+            `dep_id`,
+            `job_id`,
+            `remark`,
+            `salary`,
+            `homeplace`,
+            `create_emp_id`,
+            `modify_emp_id`,
+            `birthday`,
+            `create_time`,
+            `modify_time`,
+            `emp_head`,
+            `email`,
+            `home_address`,
+            `contact_man`,
+            `contact_phone`,
+            `relation`,
+            `qq`,
+            `wechart`,
+            `seat_code`,
+            `id_card`
+        FROM
+            `emp`
+        <where>
+            <if test="criteriaMap.kd!=null and criteriaMap.kd!=''">
+                and (
+                `emp_name` like '%${criteriaMap.kd}%' or
+                `emp_no` = #{criteriaMap.kd} or
+                `mobile` = #{criteriaMap.kd} or
+                `remark` like '%${criteriaMap.kd}%' or
+                `homeplace` like '%${criteriaMap.kd}%' or
+                `email` = #{criteriaMap.kd} or
+                `qq` = #{criteriaMap.kd} or
+                `wechart` = #{criteriaMap.kd} or
+                `seat_code` = #{criteriaMap.kd} or
+                `id_card` = #{criteriaMap.kd}
+                )
+            </if>
+            <if test="criteriaMap.floor!=null and criteriaMap.floor!=0">
+                and `salary`>=#{criteriaMap.floor}
+            </if>
+            <if test="criteriaMap.ceil!=null and criteriaMap.ceil!=0">
+                and `salary`&lt;=#{criteriaMap.ceil}
+            </if>
+            <if test="criteriaMap.depId!=null and criteriaMap.depId!=0">
+                and `dep_id`=#{criteriaMap.depId}
+            </if>
+            <if test="criteriaMap.jobId!=null and criteriaMap.jobId!=0">
+                and `job_id`=#{criteriaMap.jobId}
+            </if>
+            <if test="criteriaMap.empState!=null and criteriaMap.empState!=0">
+                and `emp_state`=#{criteriaMap.empState}
+            </if>
+            <if test="criteriaMap.sex!=null and criteriaMap.sex!=0">
+                and `sex`=#{criteriaMap.sex}
+            </if>
+        </where>
+    </select>
 </mapper>

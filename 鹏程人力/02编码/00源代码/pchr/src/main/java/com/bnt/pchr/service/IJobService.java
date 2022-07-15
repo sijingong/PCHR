@@ -1,6 +1,5 @@
 package com.bnt.pchr.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import java.util.List;
 import com.bnt.pchr.entity.Job;
 
@@ -12,19 +11,10 @@ import com.bnt.pchr.entity.Job;
 public interface IJobService {
 
    /**
-    * 条件查询,返回对象列表
-    * @param job
+    * 查询,返回对象列表
     * @return
     */
-    List<Job> selectList(Job job);
-    
-   /**
-    * 分页查询
-    *
-    * @param page
-    * @return
-    */
-    IPage<Job> selectPage(IPage<Job> page);
+    List<Job> selectList();
     
    /**
     * 根据ID查询返回一个对象
@@ -41,14 +31,6 @@ public interface IJobService {
     * @return
     */
     int deleteById(Integer jobId);
-    
-   /**
-    * 根据条件删除
-    *
-    * @param job
-    * @return
-    */
-    int delete(Job job);
 
    /**
     * 添加
@@ -66,11 +48,10 @@ public interface IJobService {
     */
     int updateById(Job job);
 
-   /**
-    * 根据条件修改
-    *
-    * @param job
-    * @return
-    */
-    int update(Job job);
+    /**
+     * 查重
+     * @param jobNo
+     * @return
+     */
+    int check(String jobNo);
 }

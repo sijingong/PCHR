@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>员工列表</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<form action="/api/emp/select_page" method="post">
+    <div>
+        <span>关键字:</span>
+        <input name="kd" type="text">
+    </div>
+    <div>
+        <span>薪资范围:</span>
+        <input name="floor" type="number">
+        <span>~</span>
+        <input name="ceil" type="number">
+    </div>
+    <div>
+        <span>性别</span>
+        <label><input name="sex" type="radio" value="0"><span>不限</span></label>
+        <label><input name="sex" type="radio" value="1"><span>男</span></label>
+        <label><input name="sex" type="radio" value="2"><span>女</span></label>
+    </div>
+    <div>
+        <span>员工状态:</span>
+        <label><input name="empState" type="radio" value="0"><span>不限</span></label>
+        <label><input name="empState" type="radio" value="1"><span>就职中</span></label>
+        <label><input name="empState" type="radio" value="9"><span>已停用</span></label>
+    </div>
+    <div>
+        <span>部门:</span>
+        <select id="depSelect" name="depId">
+            <option value="0">-----不限-----</option>
+        </select>
+    </div>
+    <div>
+        <span>职位:</span>
+        <select id="jobSelect" name="jobId">
+            <option value="0">-----不限-----</option>
+        </select>
+    </div>
+    <div>
+        <input name="current" type="hidden">
+        <input name="depState" type="hidden" value="1">
+        <input name="jobState" type="hidden" value="1">
+        <input name="size" type="hidden" value="6">
+        <button type="submit">查询</button>
+        <button onclick="toCreate()">创建</button>
+    </div>
+    <script>
+        var keyword = '[[${param.kd}]]';
+        var floor = '[[${param.floor}]]';
+        var ceil = '[[${param.ceil}]]';
+        var sex = [[${param.sex!=null?param.sex:0}]];
+        var empState = [[${param.empState!=null?param.empState:0}]];
+        var current = '[[${pageData!=null?pageData.current:1}]]'
+        $('input[name="kd"]').val(keyword);
+        $('input[name="floor"]').val(floor);
+        $('input[name="ceil"]').val(ceil);
+        $(':radio[name="sex"][value="' + sex + '"]').prop("checked", true);
+        $(':radio[name="empState"][value="' + empState + '"]').prop("checked", true);
+        $('input[name="current"]').val(current);
+    </script>
+</form>
+<div th:if="${#lists.isEmpty(pageData)}"></div>
+<div th:unless="${#lists.isEmpty(pageData)}">
+    <table>
+        <thead>
+            <tr>
+                <th>序号</th>
+                <th>编号</th>
+                <th>姓名</th>
+                <th>性别</th>
+                <th>状态</th>
+                <th>薪水</th>
+                <th>部门</th>
+                <th>职位</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:if="${#lists.isEmpty(pageData.records)}">
+                <td colspan="9" style="color: red;text-align: center">未查询到员工数据</td>
+            </tr>
+            <tr th:unless="${#lists.isEmpty(pageData.records)}" th:each="emp,v:${pageData.records}">
+                <td th:text="${v.count}" style="text-align: center"></td>
+                <td th:text="${emp.empNo}" style="text-align: center"></td>
+                <td th:text="${emp.empName}" style="text-align: center"></td>
+                <td th:text='${emp.sex==1?"男":"女"}' style="text-align: center"></td>
+                <td th:switch="${emp.empState}" style="text-align: center">
+                    <span th:case="1">在职中</span>
+                    <span th:case="9">停用中</span>
+                </td>
+                <td th:text='${emp.salary==null?"":emp.salary}' style="text-align: center"></td>
+                <td th:text="${emp.dep==null?'-':emp.dep.depName}" style="text-align: center"></td>
+                <td th:text="${emp.job==null?'-':emp.job.jobName}" style="text-align: center"></td>
+                <td style="text-align: center" th:data-emp-name="${emp.empName}" th:data-emp-id="${emp.empId}">
+                    <a href="#" onclick="deleteEmp(this)">删除</a>
+                    <a href="#" onclick="toUpdate(this)">修改</a>
+                    <a href="#" onclick="empInfo(this)">详情</a>
+                </td>
+            </tr>
+            </tr>
+        </tbody>
+    </table>
+    <div th:data-current="${pageData.current}" th:data-totalpage="${pageData.totalPage}">
+            <span th:if="${pageData.current==1}">
+                <button type="button" disabled>首&nbsp;&nbsp;页</button>
+                <button type="button" disabled>上一页</button>
+            </span>
+        <span th:unless="${pageData.current==1}">
+                <button type="button" onclick="goto(1)">首&nbsp;&nbsp;页</button>
+                <button type="button" onclick="prev(this)">上一页</button>
+            </span>
+        <button th:each="pageNum,v:${pageData.displayList}" type="button" onclick="reward(this)" th:text="${pageNum}"
+                th:disabled="${pageData.current==pageNum}"></button>
+
+        <span th:if="${pageData.current==pageData.totalPage}">
+                <button type="button" disabled>下一页</button>
+                <button type="button" disabled>尾&nbsp;&nbsp;页</button>
+            </span>
+        <span th:unless="${pageData.current==pageData.totalPage}">
+                <button type="button" onclick="next(this)">下一页</button>
+                <button type="button" onclick="gotoTail(this)">尾&nbsp;&nbsp;页</button>
+            </span>
+        <span>当前页:<span th:text="${pageData.current}"></span></span>
+        <span>跳转到</span>
+        <select id="pageSelect" onchange="goto(this.value)">
+            <option th:each="i:${#numbers.sequence(1,pageData.totalPage)}" th:text="${i}" th:value="${i}"
+                    th:selected="${pageData.current==i}"></option>
+        </select>
+    </div>
+</div>
+</body>
+<script>
+    $(function(){
+        $.ajax({
+            url: '/api/dep/select_list',
+            type: 'post',
+            dataType: 'json',
+            cache: false,
+            success: function (jsonData) {
+                var status = jsonData.status;
+                if (status != 0) {
+                    alert('加载部门数据失败！！服务器发生异常！！')
+                }
+                var depList = jsonData.data;
+                if ($.isEmptyObject(depList)) {
+                    alert('部门数据为空！！');
+                    window.close();
+                }
+                depList.forEach(function (dep) {
+                    $('#depSelect').append('<option value="' + dep.depId + '">' + dep.depName + '</option>')
+                })
+            },
+            error: function () {
+                alert('加载部门数据失败！！');
+            }
+        })
+        $.ajax({
+            url: '/api/job/select_list',
+            type: 'post',
+            dataType: 'json',
+            cache: false,
+            success: function (jsonData) {
+                var status = jsonData.status;
+                if (status != 0) {
+                    alert('加载职位数据失败！！服务器发生异常！！')
+                }
+                var jobList = jsonData.data;
+                if ($.isEmptyObject(jobList)) {
+                    alert('职位数据为空！！');
+                    window.close();
+                }
+                jobList.forEach(function (job) {
+                    $('#jobSelect').append('<option value="' + job.jobId + '">' + job.jobName + '</option>')
+                })
+            },
+            error: function () {
+                alert('加载职位数据失败！！');
+            }
+        })
+    })
+    function deleteEmp(but) {
+        var empName = $(but).parent().data("emp-name");
+        var empId = $(but).parent().data("emp-id");
+        if (!window.confirm(`确定要删除【${empName}】吗？`)) {
+            return;
+        }
+        $.ajax({
+            url: '/api/emp/delete_emp',
+            type: 'post',
+            data: {
+                empId: empId
+            },
+            dataType: 'json',
+            cache: false,
+            success: function (jsonData) {
+                var status = jsonData.status;
+                if (status != 0) {
+                    alert('删除失败！！服务器发生异常！！')
+                }
+                var rows = jsonData.data;
+                if (rows == 1) {
+                    alert('删除部门成功！！');
+                    window.location.reload();
+                } else if (rows == 0) {
+                    alert('员工不存在或已被删除！！');
+                } else {
+                    alert('服务器返回未知的状态');
+                }
+            },
+            error: function () {
+                alert('删除员工失败！')
+            }
+        })
+    }
+
+    function toUpdate(but) {
+        var empId = $(but).parent().data('emp-id');
+        window.open(`/emp/update_emp?empId=${empId}`);
+    }
+
+    function toCreate() {
+        window.open('/emp/create_emp')
+    }
+
+    function empInfo(but) {
+        var empId = $(but).parent().data('emp-id');
+        window.open(`/api/emp/emp_info?empId=${empId}`);
+    }
+
+    //首页
+    function goto(pageNum) {
+        $('input[name="current"]').val(pageNum);
+        $('form:first').submit();
+    }
+
+    //上一页
+    function prev(but) {
+        var current = $(but).parent().parent().data("current");
+        $('input[name="current"]').val(current - 1);
+        $('form:first').submit();
+    }
+
+    //下一页
+    function next(but) {
+        var current = $(but).parent().parent().data("current");
+        $('input[name="current"]').val(current + 1);
+        $('form:first').submit();
+    }
+
+    //尾页
+    function gotoTail(but) {
+        var totalPage = $(but).parent().parent().data("totalpage");
+        $('input[name="current"]').val(totalPage);
+        $('form:first').submit();
+    }
+
+    //点击中间按钮跳转
+    function reward(but) {
+        var pageNum = $(but).html();
+        $('input[name="current"]').val(pageNum);
+        $('form:first').submit();
+    }
+</script>
+</html>

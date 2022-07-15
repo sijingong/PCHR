@@ -2,6 +2,8 @@ package com.bnt.pchr.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import java.util.List;
+
+import com.bnt.pchr.commons.vo.PageData;
 import com.bnt.pchr.entity.Emp;
 
 
@@ -10,22 +12,22 @@ import com.bnt.pchr.entity.Emp;
 * Date   2022-07-13 16:05:23
 */
 public interface IEmpService {
-
-   /**
-    * 条件查询,返回对象列表
-    * @param emp
-    * @return
-    */
-    List<Emp> selectList(Emp emp);
-    
    /**
     * 分页查询
     *
-    * @param page
+    * @param pageData
     * @return
     */
-    IPage<Emp> selectPage(IPage<Emp> page);
-    
+   PageData<Emp> selectPage(PageData<Emp> pageData);
+
+    /**
+     * 根据员工编号查询返回一个对象
+     *
+     * @param empNo
+     * @return
+     */
+    Emp selectByEmpNo(String empNo);
+
    /**
     * 根据ID查询返回一个对象
     *
@@ -41,14 +43,6 @@ public interface IEmpService {
     * @return
     */
     int deleteById(Integer empId);
-    
-   /**
-    * 根据条件删除
-    *
-    * @param emp
-    * @return
-    */
-    int delete(Emp emp);
 
    /**
     * 添加
@@ -66,11 +60,11 @@ public interface IEmpService {
     */
     int updateById(Emp emp);
 
-   /**
-    * 根据条件修改
-    *
-    * @param emp
-    * @return
-    */
-    int update(Emp emp);
+    /**
+     * 查重
+     * @param empNo
+     * @param idCard
+     * @return
+     */
+    int check(String empNo,String idCard);
 }

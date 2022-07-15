@@ -138,4 +138,9 @@ public class Emp implements Serializable {
     @TableField(value = "id_card")
     private String idCard;
 
+    @TableField(exist = false)
+    private Job job;
+
+    @TableField(exist = false)
+    private Department dep;
 }

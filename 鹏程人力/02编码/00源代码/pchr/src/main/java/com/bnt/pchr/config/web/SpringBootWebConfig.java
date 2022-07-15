@@ -75,8 +75,12 @@ public class SpringBootWebConfig extends WebMvcConfigurationSupport {
 
     @Override
     protected void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("emp/login");
-        registry.addViewController("/login").setViewName("emp/login");
+        registry.addViewController("/").setViewName("login");
+        registry.addViewController("/login").setViewName("login");
+        registry.addViewController("/emp/emp_list").setViewName("emp/emp_list");
+        registry.addViewController("/emp/create_emp").setViewName("emp/create_emp");
+        registry.addViewController("/emp/modify_pwd").setViewName("emp/modify_password");
+        registry.addViewController("/emp/update_emp").setViewName("emp/update_emp");
         //配置URL与页面模板对应关系(相当于访问控制器方法,然后跳转到页面)
         registry.addViewController("/index").setViewName("index");
     }

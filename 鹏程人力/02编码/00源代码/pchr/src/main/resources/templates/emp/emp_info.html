@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>员工详情</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<ul th:if="${#lists.isEmpty(emp)}">
+    <span style="color: red;text-align: center">加载员工数据失败！！！</span>
+</ul>
+<ul th:unless="${#lists.isEmpty(emp)}">
+    <li>
+        <span>编号:</span>
+        <span th:text="${emp.empNo}"></span>
+    </li>
+    <li>
+        <span>姓名:</span>
+        <span th:text="${emp.empName==null?'-':emp.empName}"></span>
+    </li>
+    <li>
+        <span>性别:</span>
+        <span th:text="${emp.sex==1?'男':'女'}"></span>
+    </li>
+    <li>
+        <span>手机号:</span>
+        <span th:text="${emp.mobile==null?'-':emp.mobile}"></span>
+    </li>
+    <li th:switch="${emp.empState==null?0:emp.empState}">
+        <span>员工状态:</span>
+        <span th:case="1">在职中</span>
+        <span th:case="9">已停用</span>
+    </li>
+    <li>
+        <span>部门:</span>
+        <span th:text="${emp.dep==null?'-':emp.dep.depName}"></span>
+    </li>
+    <li>
+        <span>职位:</span>
+        <span th:text="${emp.job==null?'-':emp.job.jobName}"></span>
+    </li>
+    <li>
+        <span>薪水:</span>
+        <span th:text="${emp.salary==null?0:emp.salary}"></span>
+    </li>
+    <li>
+        <span>籍贯:</span>
+        <span th:text="${emp.homeplace==null?'-':emp.homeplace}"></span>
+    </li>
+    <li>
+        <span>生日:</span>
+        <span th:text="${emp.birthday==null?'-':#dates.format(emp.birthday,'yyyy-MM-dd')}"></span>
+    </li>
+    <li>
+        <span>邮箱:</span>
+        <span th:text="${emp.email==null?'-':emp.email}"></span>
+    </li>
+    <li>
+        <span>家庭住址:</span>
+        <span th:text="${emp.homeAddress==null?'-':emp.homeAddress}"></span>
+    </li>
+    <li>
+        <span>紧急联系人:</span>
+        <span th:text="${emp.contactMan==null?'-':emp.contactMan}"></span>
+    </li>
+    <li>
+        <span>紧急联系人电话:</span>
+        <span th:text="${emp.contactPhone==null?'-':emp.contactPhone}"></span>
+    </li>
+    <li>
+        <span>qq:</span>
+        <span th:text="${emp.qq==null?'-':emp.qq}"></span>
+    </li>
+    <li>
+        <span>微信:</span>
+        <span th:text="${emp.wechart==null?'-':emp.wechart}"></span>
+    </li>
+    <li>
+        <span>工位编号:</span>
+        <span th:text="${emp.seatCode==null?'-':emp.seatCode}"></span>
+    </li>
+    <li>
+        <span>身份证号:</span>
+        <span th:text="${emp.idCard==null?'-':emp.idCard}"></span>
+    </li>
+    <li>
+        <span>备注:</span>
+        <span th:text="${emp.remark==null?'-':emp.remark}"></span>
+    </li>
+</ul>
+</body>
+</html>

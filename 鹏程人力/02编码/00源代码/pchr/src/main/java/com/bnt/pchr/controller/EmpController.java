@@ -1,20 +1,173 @@
 package com.bnt.pchr.controller;
+import com.bnt.pchr.commons.util.MD5;
+import com.bnt.pchr.commons.vo.PageData;
+import com.bnt.pchr.commons.vo.ResponseData;
+import com.bnt.pchr.entity.Department;
+import com.bnt.pchr.entity.Emp;
+import com.bnt.pchr.entity.Job;
+import com.bnt.pchr.service.IDepartmentService;
+import com.bnt.pchr.service.IJobService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import com.bnt.pchr.service.IEmpService;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.List;
 
 @Slf4j
-@RequestMapping("emp")
+@RequestMapping("api/emp")
 @Controller
-@Api(value = "控制器")
+@Api(value = "员工控制器")
 public class EmpController {
 
     @Autowired
     @Qualifier("empService")
     private IEmpService empService;
 
+    @Autowired
+    @Qualifier("jobService")
+    private IJobService jobService;
+
+    @Autowired
+    @Qualifier("departmentService")
+    private IDepartmentService departmentService;
+
+    @PostMapping("select_page")
+    public String selectPage(String kd, Integer floor, Integer ceil, Emp emp, PageData<Emp> pageData, Integer jobState, Integer depState, Model model){
+        HashMap map = new HashMap<String, Object>();
+        map.put("kd",kd);
+        map.put("floor",floor);
+        map.put("ceil",ceil);
+        map.put("depId",emp.getDepId());
+        map.put("jobId",emp.getJobId());
+        map.put("empState",emp.getEmpState());
+        map.put("sex",emp.getSex());
+        pageData.setCriteriaMap(map);
+        pageData = empService.selectPage(pageData);
+        List<Emp> empList = pageData.getRecords();
+        for(Emp el:empList){
+            if(jobState!=null&&jobState==1){
+                if(el.getJobId()!=null){
+                    Job job = jobService.selectOne(el.getJobId());
+                    el.setJob(job);
+                }
+            }
+            if(depState!=null&&depState==1){
+                if(el.getDepId()!=null){
+                    Department dep = departmentService.selectOne(el.getDepId());
+                    el.setDep(dep);
+                }
+            }
+        }
+        model.addAttribute("pageData",pageData);
+        return "emp/emp_list";
+    }
+
+    @GetMapping("update_state")
+    @ResponseBody
+    public ResponseData updateState(@RequestParam Integer empId,@RequestParam Integer empState){
+        Emp emp = new Emp();
+        emp.setEmpId(empId);
+        emp.setEmpState(empState);
+        int rows = empService.updateById(emp);
+        return ResponseData.SUCCESS(rows);
+    }
+
+    @GetMapping("reset_password")
+    @ResponseBody
+    public ResponseData resetPassword(@RequestParam Integer empId){
+        Emp emp = new Emp();
+        emp.setEmpId(empId);
+        String md5Str = MD5.getMD5("sb"+"123456");
+        emp.setPassword(md5Str);
+        int rows = empService.updateById(emp);
+        return ResponseData.SUCCESS(rows);
+    }
+
+    @PostMapping("login")
+    @ResponseBody
+    public ResponseData login(@RequestParam String empNo, @RequestParam String pwd, HttpSession session){
+        Emp emp = empService.selectByEmpNo(empNo);
+        System.out.println("emp:"+emp);
+        if(emp==null){
+            return ResponseData.FAIL(-1,"无此编号员工");
+        }
+        String md5Str = MD5.getMD5("sb"+pwd);
+        session.setAttribute("emp",emp);
+        if(md5Str.equals(MD5.getMD5("sb123456"))){
+            return ResponseData.FAIL(990,"初始密码未修改，安全性不高");
+        }
+        return ResponseData.SUCCESS(1);
+    }
+
+    @PostMapping("logout")
+    public String logout(@RequestParam String empId,Model model, HttpSession session){
+        session.removeAttribute(empId);
+        return "login";
+    }
+
+    @PostMapping("create_emp")
+    @ResponseBody
+    public ResponseData createEmp(Emp emp){
+        int check = empService.check(emp.getEmpNo(), emp.getIdCard());
+        if(check>0){
+            return ResponseData.SUCCESS(2);
+        }
+        String md5Str = MD5.getMD5("sb"+"123456");
+        emp.setPassword(md5Str);
+        emp.setEmpState(1);
+        int rows = empService.insert(emp);
+        return ResponseData.SUCCESS(rows);
+    }
+
+    @PostMapping("update_emp")
+    @ResponseBody
+    public ResponseData updateEmp(Emp emp){
+        if(emp.getEmpNo()!=null&&emp.getIdCard()!=null){
+            int check = empService.check(emp.getEmpNo(), emp.getIdCard());
+            if(check>0){
+                return ResponseData.SUCCESS(2);
+            }
+        }
+        int rows = empService.updateById(emp);
+        return ResponseData.SUCCESS(rows);
+    }
+
+    @PostMapping("modify_pwd")
+    @ResponseBody
+    public ResponseData modifyPwd(@RequestParam String oldPassword,@RequestParam String newPassword,@RequestParam Integer empId){
+        Emp emp = empService.selectOne(empId);
+        String checkPwd = emp.getPassword();
+        if(!checkPwd.equals(MD5.getMD5("sb"+oldPassword))){
+            return ResponseData.FAIL(-1,"与原密码相同！");
+        }else {
+            emp.setPassword(MD5.getMD5("sb"+newPassword));
+            return ResponseData.SUCCESS(1);
+        }
+    }
+
+    @PostMapping("delete_emp")
+    @ResponseBody
+    public ResponseData deleteEmp(Integer empId){
+        int rows = empService.deleteById(empId);
+        return ResponseData.SUCCESS(rows);
+    }
+
+    @GetMapping("emp_info")
+    public String empInfo(Integer empId,Model model){
+        Emp emp = empService.selectOne(empId);
+        Job job = jobService.selectOne(emp.getJobId());
+        emp.setJob(job);
+        Department dep = departmentService.selectOne(emp.getDepId());
+        emp.setDep(dep);
+        model.addAttribute("emp",emp);
+        return "emp/emp_info";
+    }
 }

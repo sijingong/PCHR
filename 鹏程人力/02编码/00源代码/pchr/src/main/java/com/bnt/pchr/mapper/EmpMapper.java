@@ -1,6 +1,7 @@
 package com.bnt.pchr.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.bnt.pchr.commons.vo.PageData;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.bnt.pchr.entity.Emp;
@@ -10,5 +11,5 @@ import com.bnt.pchr.entity.Emp;
 */
 @Mapper
 public interface EmpMapper extends BaseMapper<Emp> {
-
+    PageData<Emp> selectPage(PageData<Emp> pageData);
 }

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>创建员工</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <form id="createForm" action="#">
+        <div>
+            <span>姓名:</span>
+            <input name="empName" type="text">
+        </div>
+        <div>
+            <span>编号:</span>
+            <input name="empNo" type="text">
+        </div>
+        <div>
+            <span>性别:</span>
+            <label><input name="sex" value="1" type="radio" checked>男</label>
+            <label><input name="sex" value="2" type="radio">女</label>
+        </div>
+        <div>
+            <span>手机号:</span>
+            <input name="mobile" type="text">
+        </div>
+        <div>
+            <span>状态:</span>
+            <label><input name="empState" value="1" type="radio" checked>正常</label>
+            <label><input name="empState" value="9" type="radio">停用</label>
+        </div>
+        <div>
+            <span>部门:</span>
+            <select id="depSelect" name="depId"></select>
+        </div>
+        <div>
+            <span>职位:</span>
+            <select id="jobSelect" name="jobId"></select>
+        </div>
+        <div>
+            <span>薪水:</span>
+            <input name="salary" type="number" value="7500">
+        </div>
+        <div>
+            <span>籍贯:</span>
+            <input name="homeplace" type="text">
+        </div>
+        <div>
+            <span>生日:</span>
+            <input name="birthday" type="date">
+        </div>
+        <div>
+            <span>邮箱:</span>
+            <input name="email" type="text">
+        </div>
+        <div>
+            <span>家庭住址:</span>
+            <input name="email" type="text">
+        </div>
+        <div>
+            <span>紧急联系人电话:</span>
+            <input name="contactPhone" type="text">
+        </div>
+        <div>
+            <span>qq:</span>
+            <input name="qq" type="text">
+        </div>
+        <div>
+            <span>微信:</span>
+            <input name="wechart" type="text">
+        </div>
+        <div>
+            <span>座位号:</span>
+            <input name="seatCode" type="text">
+        </div>
+        <div>
+            <span>身份证号:</span>
+            <input name="idCard" type="text">
+        </div>
+        <div>
+            <span>备注:</span>
+            <textarea name="remark"></textarea>
+        </div>
+        <div>
+            <button type="button" onclick="createEmp()">创建</button>
+        </div>
+    </form>
+</body>
+<script>
+    $(function(){
+        $.ajax({
+            url: '/api/dep/select_list',
+            type: 'post',
+            dataType: 'json',
+            cache: false,
+            success: function (jsonData) {
+                var status = jsonData.status;
+                if (status != 0) {
+                    alert('加载部门数据失败！！服务器发生异常！！')
+                }
+                var depList = jsonData.data;
+                if ($.isEmptyObject(depList)) {
+                    alert('部门数据为空！！');
+                    window.close();
+                }
+                depList.forEach(function (dep) {
+                    $('#depSelect').append('<option value="' + dep.depId + '">' + dep.depName + '</option>')
+                })
+            },
+            error: function () {
+                alert('加载部门数据失败！！');
+            }
+        })
+        $.ajax({
+            url: '/api/job/select_list',
+            type: 'post',
+            dataType: 'json',
+            cache: false,
+            success: function (jsonData) {
+                var status = jsonData.status;
+                if (status != 0) {
+                    alert('加载职位数据失败！！服务器发生异常！！')
+                }
+                var jobList = jsonData.data;
+                if ($.isEmptyObject(jobList)) {
+                    alert('职位数据为空！！');
+                    window.close();
+                }
+                jobList.forEach(function (job) {
+                    $('#jobSelect').append('<option value="' + job.jobId + '">' + job.jobName + '</option>')
+                })
+            },
+            error: function () {
+                alert('加载职位数据失败！！');
+            }
+        })
+    })
+    function createEmp(){
+        var formData=$('#createForm').serialize();
+        $.ajax({
+            url:'/api/emp/create_emp',
+            data:formData,
+            type:'post',
+            cache:false,
+            dataType:'json',
+            success:function(jsonData){
+                var status=jsonData.status;
+                if(status!=0){
+                    alert('创建失败！！服务器发生异常！！');
+                }
+                var rows=jsonData.data;
+                if(rows==1){
+                    alert('创建员工成功！！');
+                    window.open('/emp/emp_list');
+                }else if(rows==2){
+                    alert('该员工已存在！！');
+                }else {
+                    alert('创建员工失败！！');
+                }
+            },
+            error:function(){
+                alert('创建员工失败！！');
+            }
+        })
+    }
+    
+</script>
+</html>

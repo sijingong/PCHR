@@ -1,5 +1,6 @@
 package com.bnt.pchr.service.impl;
-import com.baomidou.mybatisplus.core.metadata.IPage;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -16,42 +17,37 @@ public class JobServiceImpl implements IJobService {
     private JobMapper jobMapper;
 
     @Override
-    public List<Job> selectList(Job job){
-        return null;
-    }
-
-    @Override
-    public IPage<Job> selectPage(IPage<Job> page){
-        return null;
+    public List<Job> selectList(){
+        QueryWrapper<Job> qw = new QueryWrapper<>();
+        return jobMapper.selectList(qw);
     }
 
     @Override
     public Job selectOne(Integer jobId) {
-        return null;
+        QueryWrapper<Job> qw = new QueryWrapper<>();
+        qw.eq("job_id",jobId);
+        return jobMapper.selectOne(qw);
     }
 
     @Override
     public int deleteById(Integer jobId) {
-    return 0;
-    }
-
-    @Override
-    public int delete(Job job){
-        return 0;
+    return jobMapper.deleteById(jobId);
     }
 
     @Override
     public int insert(Job job) {
-        return 0;
+        return jobMapper.insert(job);
     }
 
     @Override
     public int updateById(Job job) {
-        return 0;
+        return jobMapper.updateById(job);
     }
 
     @Override
-    public int update(Job job) {
-        return 0;
+    public int check(String jobNo) {
+        QueryWrapper<Job> qw = new QueryWrapper<>();
+        qw.eq("job_no",jobNo);
+        return jobMapper.selectCount(qw).intValue();
     }
 }
