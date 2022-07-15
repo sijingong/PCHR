@@ -1,7 +1,8 @@
 package com.bnt.pchr.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import java.util.List;
+
+import com.bnt.pchr.commons.vo.PageData;
 import com.bnt.pchr.entity.DayAttend;
 
 
@@ -19,21 +20,29 @@ public interface IDayAttendService {
     List<DayAttend> selectList(DayAttend dayAttend);
     
    /**
-    * 分页查询
+    * 根据时间段、关键字、状态进行分页查询
     *
     * @param page
     * @return
     */
-    IPage<DayAttend> selectPage(IPage<DayAttend> page);
+    PageData<DayAttend> selectPage(PageData<DayAttend> page);
     
    /**
-    * 根据ID查询返回一个对象
+    * 根据ID查询返回一个打卡记录
+    * 查看该时间是否已经打卡
     *
     * @param attendId
     * @return
     */
     DayAttend selectOne(Integer attendId);
-    
+
+    /**
+     * 判断当天是否已经打卡
+     * @param dayAttend
+     * @param page
+     * @return
+     */
+    Boolean isAttended(DayAttend dayAttend,PageData<DayAttend> page);
    /**
     * 根据ID删除
     *
@@ -74,7 +83,7 @@ public interface IDayAttendService {
     int updateById(DayAttend dayAttend);
 
    /**
-    * 根据条件修改
+    * 根据条件修改(状态)
     *
     * @param dayAttend
     * @return

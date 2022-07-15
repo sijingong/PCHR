@@ -3,4 +3,64 @@
         PUBLIC "-//mybatis.org//DTD Mapper3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.bnt.pchr.mapper.DayAttendMapper">
+    <select id="selectTimeBetWeen" resultType="DayAttendVO">
+        <![CDATA[
+        select d.`emp_id`,
+               d.`supp_emp_id`,
+               d.`attend_state`,
+               d.`attend_time`,
+               d.`supp_time`,
+               d.`end_time` ,
+               d.`emp_id` as empId,
+               e.`emp_name`,
+               e.`emp_no`,
+               e.`mobile`
+        from  `day_attend` as d left join `emp` as e on
+                   e.`emp_id`=d.`emp_id`
+]]>
+        <where>
+            <if test="@cn.hutool.core.util.StrUtil@isNotEmpty(criteriaMap.kd)">
+                <![CDATA[
+                and ( e.`emp_no` like '%${criteriaMap.kd}%'
+                    or e.`emp_name` like '%${criteriaMap.kd}%'
+                    or e.`mobile` like '%${criteriaMap.kd}%'
+                    )
+]]>
+            </if>
+            <if test="criteriaMap.empId!=null">
+                <![CDATA[
+                        e.`emp_id`=#{criteriaMap.empId,jdbcType=INTEGER}
+            ]]>
+            </if>
+            <if test="@cn.hutool.core.util.StrUtil@isNotEmpty(criteriaMap.attendState)">
+                <![CDATA[
+                    d.`attend_state`=#{criteriaMap.attendState,jdbcType=INTEGER}
+]]>
+            </if>
+            <if test="@cn.hutool.core.util.StrUtil@isNotEmpty(criteriaMap.begin)">
+                <![CDATA[and CONVERT(d.`attend_time`,SIGNED)>=#{criteriaMap.begin}]]>
+            </if>
+            <if test="@cn.hutool.core.util.StrUtil@isNotEmpty(criteriaMap.end)">
+                <![CDATA[and CONVERT(d.`end_time`,SIGNED)<=#{criteriaMap.end}]]>
+            </if>
+        </where>
+    </select>
+    <select id="booleanIsAttended" >
+        <![CDATA[
+        select `attend_time`,
+               `end_time`,
+               `attend_state`
+            from `day_attend`
+]]>
+        <where>
+            <if test="@cn.hutool.core.util.StrUtil@isNotEmpty(criteriaMap.empId)">
+                <![CDATA[
+                `emp_id`=#{criteriaMap.empId,jdbcType=INTEGER}
+]]>
+            </if>
+            <if test="@cn.hutool.core.util.StrUtil@isNotEmpty(criteriaMap.empId)">
+                <![CDATA[]]>
+            </if>
+        </where>
+    </select>
 </mapper>
