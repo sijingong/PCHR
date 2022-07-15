@@ -3,4 +3,26 @@
         PUBLIC "-//mybatis.org//DTD Mapper3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.bnt.pchr.mapper.MemoMapper">
+    <!--根据分页条件查询备忘录-->
+    <select id="selectPage" resultType="memo">
+        <![CDATA[
+            select `memo_id` as  memoId,
+                   `memo_no` as memoNo,
+                   `memo_name` as memoName,
+                   `create_time` as createTime,
+                   `modify_time` as modifyTime,
+                   `content`,
+                   `emp_id` as empId
+            from `emp_memo` as m
+        ]]>
+        <where>
+            <if test="@cn.hutool.core.util.StrUtil@isNotEmpty(criteriaMap.kw)">
+                <![CDATA[and (`memo_no` like '%${criteriaMap.kw}%'
+                                or `memo_name` like '%${criteriaMap.kw}%'
+                                or `content` like '%${criteriaMap.kw}%'
+                                or `create_time` like '%${criteriaMap.kw}%')]]>
+            </if>
+        </where>
+    </select>
+
 </mapper>

@@ -1,6 +1,7 @@
 package com.bnt.pchr.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.bnt.pchr.commons.vo.PageData;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.bnt.pchr.entity.Memo;
@@ -10,5 +11,11 @@ import com.bnt.pchr.entity.Memo;
 */
 @Mapper
 public interface MemoMapper extends BaseMapper<Memo> {
+    /**
+     * 根据分页条件查询备忘录
+     * @param pageData
+     * @return
+     */
+    PageData<Memo> selectPage(PageData<Memo> pageData);
 
 }
