@@ -17,6 +17,12 @@ public interface IEmpContractService {
     * @return
     */
     List<EmpContract> selectList(EmpContract empContract);
+
+    /**
+     * 无条件查询,返回对象列表
+     * @return
+     */
+    List<EmpContract> selectList();
     
    /**
     * 分页查询

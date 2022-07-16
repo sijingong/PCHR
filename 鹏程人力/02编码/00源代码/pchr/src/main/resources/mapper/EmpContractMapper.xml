@@ -3,4 +3,19 @@
         PUBLIC "-//mybatis.org//DTD Mapper3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.bnt.pchr.mapper.EmpContractMapper">
+    <select id="selectList" resultType="empContract">
+        <![CDATA[
+        select `contract_id` as contractId,
+               c.`emp_id` as `empId`,
+               c.`temp_id` as tempId,
+               `contract_path` as contractPath,
+               `start_date`  as startDate,
+               `end_date`    as endDate,
+               e.`emp_id` as `emp.empId`,
+               `emp_name` as  `emp.empName`
+        from `emp_contract` as c
+                 inner join `emp` as e
+                            on c.emp_id = e.emp_id
+        ]]>
+    </select>
 </mapper>

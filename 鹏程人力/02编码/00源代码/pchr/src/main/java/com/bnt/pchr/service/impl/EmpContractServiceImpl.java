@@ -1,4 +1,5 @@
 package com.bnt.pchr.service.impl;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,6 +19,11 @@ public class EmpContractServiceImpl implements IEmpContractService {
     @Override
     public List<EmpContract> selectList(EmpContract empContract){
         return null;
+    }
+
+    @Override
+    public List<EmpContract> selectList() {
+        return empContractMapper.selectList();
     }
 
     @Override

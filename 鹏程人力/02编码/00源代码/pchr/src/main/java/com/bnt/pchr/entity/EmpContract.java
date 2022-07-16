@@ -53,5 +53,7 @@ public class EmpContract implements Serializable {
     @ApiModelProperty(value = "end_date")
     @TableField(value = "end_date")
     private Date endDate;
+    @TableField(exist = false)
+    private Emp emp;//非表字段
 
 }
