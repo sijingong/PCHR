@@ -14,10 +14,11 @@ import org.apache.ibatis.type.Alias;
 
 import java.io.Serializable;
 import java.util.Date;
+
 /**
-* Author bnt
-* Date  2022-07-13 16:05:23
-*/
+ * Author bnt
+ * Date  2022-07-13 16:05:23
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -143,4 +144,10 @@ public class Emp implements Serializable {
 
     @TableField(exist = false)
     private Department dep;
+
+    @TableField(exist = false)
+    private Resume resume;
+
+    @TableField(exist = false)
+    private EmpContract contract;
 }

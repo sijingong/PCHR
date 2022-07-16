@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:include="common/public::head('简历列表')">
+    <meta charset="UTF-8">
+    <title>简历列表</title>
+</head>
+<body>
+<ol class="breadcrumb">
+    <li>当前位置:简历列表</li>
+</ol>
+<div class="container-fluid" style="padding-left: 0px;">
+    <div class="well">
+        <form action="/api/emp/resumes" method="post">
+            <div class="form-group" style="width: 100%">
+                <div class="row">
+                    <div class="col-md-1">
+                        <span>关键字:</span>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" id="kd" name="kd" class="form-control" th:value="${param.kd}"
+                               placeholder="请输入员工姓名、编码、手机号码、身份证、邮箱等信息">
+                    </div>
+                    <div>
+                        <!--导入分页信息公共模板,10表示每一页显示的记录条数,根据实际情况跳转-->
+                        <div th:replace="common/public::page(10)"></div>
+                        <button type="submit" class="btn btn-primary" title="查询简历"><span
+                                class="glyphicon glyphicon-search"></span></button>
+                        <button type="button" class="btn btn-primary" title="创建简历" onclick="showAddResumeDialog()"><span
+                                class="glyphicon glyphicon-plus"></span></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div th:if="${pageData==null}"></div>
+<div th:unless="${pageData==null}">
+    <table class="table table-hover table-striped table-bordered">
+        <thead>
+        <tr class="info">
+        <tr>
+            <th class="text-center">序号</th>
+            <th class="text-center">员工姓名</th>
+            <th class="text-center">所属部门</th>
+            <th class="text-center">简历</th>
+            <th>操作</th>
+        </tr>
+        </tr>
+        </thead>
+        <tbody th:if="${#lists.isEmpty(pageData.records)}">
+        <tr>
+            <td style="color: #0000ff;text-align: center" colspan="5">未查询到任何员工信息</td>
+        </tr>
+        </tbody>
+        <tbody th:unless="${#lists.isEmpty(pageData.records)}" th:each="emp,v:${pageData.records}">
+        <tr>
+            <td th:text="${v.count}"></td>
+            <td th:text="${emp.empName}"></td>
+            <td th:text="${emp.dep==null?'-':emp.dep.depName}"></td>
+            <td th:text="${emp.resume==null?'未上传':emp.resume.resumeFilePath}">
+            </td>
+            <td>
+                <button type="button" class="btn btn-danger btn-sm" title="删除简历">
+                    <span class="glyphicon glyphicon-remove"></span>
+                </button>
+                <button type="button" class="btn bg-primary btn-sm" title="修改角色">
+                   <span class="glyphicon glyphicon-plus"></span>
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div th:unless="${#lists.isEmpty(pageData.records)}" style="text-align: center">
+        <script src="/static/js/common/pagination_plugs_1.0.js"></script>
+        <ul class="pagination" style="margin-top: 0px!important;">
+
+        </ul>
+        <!-- Modal -->
+        <div class="modal fade" id="resumeModal" tabindex="-1" resume="dialog" aria-labelledby="myModalLabel">
+        </div>
+        <script>
+            /**
+             *  打开添加简历模态框
+             */
+            function showAddResumeDialog() {
+                if (1 == $(".modal-dialog").length) {
+                    //如果已打开过模态框,直接显示
+                    $("#resumeModal").modal();
+                    return;
+                }
+                $.ajax({
+                    type: 'get',
+                    url: '/v/resume/create_resume',
+                    dataType: 'html',
+                    success: function (data) {
+                        $("#resumeModal").html(data);
+                        $("#resumeModal").modal();
+                    },
+                    error: function () {
+                    }
+                });
+            }
+        </script>
+    </div>
+</div>
+</body>
+</html>
