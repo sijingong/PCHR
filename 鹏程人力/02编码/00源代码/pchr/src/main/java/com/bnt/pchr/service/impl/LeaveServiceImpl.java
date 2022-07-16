@@ -22,20 +22,13 @@ public class LeaveServiceImpl implements ILeaveService {
 
     @Override
     public List<Leave> selectList(Leave leave){
-        return null;
-    }
-
-    @Override
-    public PageData<Leave> selectByEmpId(PageData<Leave> pageData) {
-        return leaveMapper.selectByEmpId(pageData);
-    }
-
-    @Override
-    public List<Leave> selectByEmpId(Leave leave) {
         QueryWrapper qw=new QueryWrapper<>();
-        Integer empId=leave.getEmpId();
-        qw.eq("emp_id",empId);
         return leaveMapper.selectList(qw);
+    }
+
+    @Override
+    public PageData<Leave> selectPage(PageData<Leave> pageData) {
+        return leaveMapper.selectPage(pageData);
     }
 
     @Override

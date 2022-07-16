@@ -14,26 +14,20 @@ import com.bnt.pchr.entity.Leave;
 public interface ILeaveService {
 
     /**
-     * 条件查询,返回对象列表
+     * 查询请假申请表列表
      * @param leave
      * @return
      */
     List<Leave> selectList(Leave leave);
 
-    /**
-     * 根据员工ID查询请假申请
-     * @param leave
-     * @return
-     */
-    List<Leave> selectByEmpId(Leave leave);
 
     /**
-     * 分页查询
+     * 分页查询请假申请表
      *
      * @param pageData
      * @return
      */
-    PageData<Leave> selectByEmpId(PageData<Leave> pageData);
+    PageData<Leave> selectPage(PageData<Leave> pageData);
 
     /**
      * 分页查询

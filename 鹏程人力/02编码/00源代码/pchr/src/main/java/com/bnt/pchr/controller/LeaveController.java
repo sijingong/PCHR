@@ -13,7 +13,7 @@ import com.bnt.pchr.service.ILeaveService;
 import java.util.List;
 
 @Slf4j
-@RequestMapping("api/leave")
+@RequestMapping("leave")
 @Controller
 @Api(value = "请假申请控制器")
 public class LeaveController  {
@@ -73,7 +73,7 @@ public class LeaveController  {
     }
 
     /**
-     * 根据员工ID查询请假申请表
+     * 查询请假申请表列表
      * @param leave
      * @return
      */
@@ -81,7 +81,7 @@ public class LeaveController  {
     @ResponseBody
     public ResponseData selectByEmpId(Leave leave)
     {
-        List<Leave> leaveList=leaveService.selectByEmpId(leave);
+        List<Leave> leaveList=leaveService.selectList(leave);
         return ResponseData.SUCCESS(leaveList);
     }
 
@@ -105,6 +105,79 @@ public class LeaveController  {
         pageData.setSize(size);
         pageData.setOrderRuleList(orderRules);
         pageData.addCriteria("empId",empId);
-        return ResponseData.SUCCESS(leaveService.selectByEmpId(pageData));
+        return ResponseData.SUCCESS(leaveService.selectPage(pageData));
     }
+
+    /**
+     * 根据申请状态查询请假表
+     * @param applyState
+     * @param current
+     * @param size
+     * @param orderRules
+     * @return
+     */
+    @RequestMapping("select_by_apply_state")
+    @ResponseBody
+    public ResponseData selectByApplyState(Integer applyState,long current,long size,@RequestParam(required = false) String[] orderRules)
+    {
+        if(applyState==null)
+        {
+            return ResponseData.FAIL(400,"缺少申请状态参数");
+        }
+        PageData<Leave> pageData=new PageData<>();
+        pageData.setSize(size);
+        pageData.setCurrent(current);
+        pageData.setOrderRuleList(orderRules);
+        pageData.addCriteria("applyState",applyState);
+        return ResponseData.SUCCESS(leaveService.selectPage(pageData));
+    }
+
+    /**
+     * 根据请假类型查询请假表
+     * @param leaveType
+     * @param current
+     * @param size
+     * @param orderRules
+     * @return
+     */
+    @RequestMapping("select_by_leave_type")
+    @ResponseBody
+    public ResponseData selectByLeaveType(Integer leaveType,long current,long size,@RequestParam(required = false) String[] orderRules)
+    {
+        if(leaveType==null)
+        {
+            return ResponseData.FAIL(400,"缺少请假类型参数");
+        }
+        PageData<Leave> pageData=new PageData<>();
+        pageData.setSize(size);
+        pageData.setCurrent(current);
+        pageData.setOrderRuleList(orderRules);
+        pageData.addCriteria("leaveType",leaveType);
+        return ResponseData.SUCCESS(leaveService.selectPage(pageData));
+    }
+
+    /**
+     * 根据销假状态查询请假表
+     * @param destoryState
+     * @param current
+     * @param size
+     * @param orderRules
+     * @return
+     */
+    @RequestMapping("select_by_destory_state")
+    @ResponseBody
+    public ResponseData selectByDestoryState(Integer destoryState,long current,long size,@RequestParam(required = false) String[] orderRules)
+    {
+        if(destoryState==null)
+        {
+            return ResponseData.FAIL(400,"缺少销假状态参数");
+        }
+        PageData<Leave> pageData=new PageData<>();
+        pageData.setSize(size);
+        pageData.setCurrent(current);
+        pageData.setOrderRuleList(orderRules);
+        pageData.addCriteria("destoryState",destoryState);
+        return ResponseData.SUCCESS(leaveService.selectPage(pageData));
+    }
+
 }

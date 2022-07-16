@@ -12,9 +12,9 @@ import com.bnt.pchr.entity.Leave;
 @Mapper
 public interface LeaveMapper extends BaseMapper<Leave> {
     /**
-     * 根据员工ID查询请假申请表
+     * 根据条件查询请假申请表
      * @param pageData
      * @return
      */
-    PageData<Leave> selectByEmpId(PageData<Leave> pageData);
+    PageData<Leave> selectPage(PageData<Leave> pageData);
 }
