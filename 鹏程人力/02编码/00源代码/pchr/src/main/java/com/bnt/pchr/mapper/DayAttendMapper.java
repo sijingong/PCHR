@@ -23,6 +23,6 @@ public interface DayAttendMapper extends BaseMapper<DayAttend> {
      * @param page
      * @return
      */
-    PageData<DayAttend> booleanIsAttended(PageData<DayAttend> page);
+    PageData<DayAttend> ListAttended(PageData<DayAttend> page);
 
 }

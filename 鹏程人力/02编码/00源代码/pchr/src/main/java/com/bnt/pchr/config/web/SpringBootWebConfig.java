@@ -51,7 +51,7 @@ public class SpringBootWebConfig extends WebMvcConfigurationSupport {
         //配置消息转换器---将控制器方法转成指定的格式---要加responseBody
         FastJsonHttpMessageConverter fastJsonHttpMessageConverter = new FastJsonHttpMessageConverter();
         FastJsonConfig fastJsonConfig = new FastJsonConfig();
-        fastJsonConfig.setDateFormat("yyyy-MM-dd");
+        fastJsonConfig.setDateFormat("yyyy-MM-dd HH:mm:ss");
         fastJsonConfig.setCharset(Charset.forName("utf-8"));
         //设置序列化
         fastJsonConfig.setSerializerFeatures(

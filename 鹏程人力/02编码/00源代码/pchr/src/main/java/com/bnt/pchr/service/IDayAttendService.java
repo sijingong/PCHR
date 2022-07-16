@@ -37,12 +37,11 @@ public interface IDayAttendService {
     DayAttend selectOne(Integer attendId);
 
     /**
-     * 判断当天是否已经打卡
+     * 查询已经打卡的列表
      * @param dayAttend
-     * @param page
      * @return
      */
-    Boolean isAttended(DayAttend dayAttend,PageData<DayAttend> page);
+    List<DayAttend> isAttended(DayAttend dayAttend);
    /**
     * 根据ID删除
     *

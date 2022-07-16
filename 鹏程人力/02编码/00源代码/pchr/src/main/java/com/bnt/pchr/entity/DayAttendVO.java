@@ -9,6 +9,7 @@ import lombok.ToString;
 import org.apache.ibatis.type.Alias;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -34,4 +35,8 @@ public class DayAttendVO {
     private String empNo;
     //手机号码
     private String mobile;
+    //日期列表
+    private List<Date> dateList;
+    //存放已打卡的DayAttended记录
+    private List<DayAttend> attendedList;
 }

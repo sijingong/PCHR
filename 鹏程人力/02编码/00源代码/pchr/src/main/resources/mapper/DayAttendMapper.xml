@@ -45,7 +45,7 @@
             </if>
         </where>
     </select>
-    <select id="booleanIsAttended" >
+    <select id="ListAttended" resultType="dayAttendVO">
         <![CDATA[
         select `attend_time`,
                `end_time`,
@@ -58,9 +58,10 @@
                 `emp_id`=#{criteriaMap.empId,jdbcType=INTEGER}
 ]]>
             </if>
-            <if test="@cn.hutool.core.util.StrUtil@isNotEmpty(criteriaMap.empId)">
-                <![CDATA[]]>
-            </if>
         </where>
+        <!-- 排序-->
+        <if test="@cn.hutool.core.util.StrUtil@isNotEmpty(orderBySQL)">
+            <![CDATA[order by ${orderBySQL}]]>
+        </if>
     </select>
 </mapper>

@@ -56,20 +56,32 @@ public class DayAttendServiceImpl implements IDayAttendService {
     }
 
     @Override
-    public Boolean isAttended(DayAttend dayAttend, PageData<DayAttend> page) {
-        Calendar startTime=Calendar.getInstance();
-        startTime.set(Calendar.HOUR,9);
-        startTime.set(Calendar.MINUTE,0);
-        startTime.set(Calendar.SECOND,0);
-        Calendar endTime=Calendar.getInstance();
-        endTime.set(Calendar.HOUR,18);
-        endTime.set(Calendar.MINUTE,0);
-        endTime.set(Calendar.SECOND,0);
-        page.addCriteria("startTime",startTime);
-        page.addCriteria("endTime",endTime);
-        page.getCriteriaMap();
-        Map<String,Object> criteriaMap=page.getCriteriaMap();
-        return null;
+    public List<DayAttend> isAttended(DayAttend dayAttend) {
+        QueryWrapper<DayAttend> qw = new QueryWrapper<>();
+        qw.eq("emp_id",dayAttend.getEmpId());
+        List<DayAttend> dayList = dayAttendMapper.selectList(qw);
+        List<DayAttend> attended=new ArrayList<>();//用于存放已经打卡的记录
+        for (DayAttend day:dayList){
+            Date startTime = day.getAttendTime();
+            long endTime = day.getEndTime().getTime();
+            Calendar calendar=Calendar.getInstance();
+            calendar.setTime(startTime);
+            //
+            calendar.set(Calendar.MONTH,Calendar.MONTH+4);
+            calendar.set(Calendar.HOUR,9);
+            calendar.set(Calendar.MINUTE,0);
+            calendar.set(Calendar.SECOND,0);
+            long start = calendar.getTimeInMillis();
+            System.out.println("标准上班："+calendar.getTime());
+            calendar.set(Calendar.HOUR,18);
+            System.out.println("标准下班："+calendar.getTime());
+            //标准下班
+            long end = calendar.getTimeInMillis();
+            if(startTime.getTime()<=start&&end<=endTime){
+                attended.add(day);//已经打卡
+            }
+        }
+        return attended;
     }
 
     @Override

@@ -14,7 +14,7 @@ import com.bnt.pchr.service.IDayAttendService;
 import java.util.*;
 
 @Slf4j
-@RequestMapping("api/dayAttend")
+@RequestMapping("dayAttend")
 @Controller
 @Api(value = "控制器")
 public class DayAttendController {
@@ -108,17 +108,19 @@ public class DayAttendController {
     }
 
     /**
-     * 判断当天是否已经打卡
-     * @param pageData
-     * @param current
-     * @param size
+     * 查询已经打卡的列表
      * @param dayAttend
+     * @return
      */
-    public  boolean booleanIsAttended(PageData pageData,long current,long size,DayAttend dayAttend,Date nowDay){
-        pageData.addCriteria("empId",dayAttend.getEmpId());
-        pageData.addCriteria("nowDay",nowDay);
-        pageData.setSize(size);
-        pageData.setCurrent(current);
-         return dayAttendService.isAttended(dayAttend,pageData);
+    @PostMapping("select_attended")
+    @ResponseBody
+    public ResponseData Attended(DayAttend dayAttend){
+        List<Date> dateList=new ArrayList<>();
+        List<DayAttend> dayAttendList=dayAttendService.isAttended(dayAttend);
+        for (DayAttend day:dayAttendList){
+            Date date=day.getAttendTime();
+            dateList.add(date);
+        }
+        return ResponseData.SUCCESS(dayAttendList);
     }
 }
