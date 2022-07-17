@@ -6,7 +6,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-<form action="/api/emp/select_page" method="post">
+<form action="/emp/select_page" method="post">
     <div>
         <span>关键字:</span>
         <input name="kd" type="text">
@@ -137,7 +137,7 @@
 <script>
     $(function(){
         $.ajax({
-            url: '/api/dep/select_list',
+            url: '/dep/select_list',
             type: 'post',
             dataType: 'json',
             cache: false,
@@ -160,7 +160,7 @@
             }
         })
         $.ajax({
-            url: '/api/job/select_list',
+            url: '/job/select_list',
             type: 'post',
             dataType: 'json',
             cache: false,
@@ -190,7 +190,7 @@
             return;
         }
         $.ajax({
-            url: '/api/emp/delete_emp',
+            url: '/emp/delete_emp',
             type: 'post',
             data: {
                 empId: empId
@@ -220,16 +220,16 @@
 
     function toUpdate(but) {
         var empId = $(but).parent().data('emp-id');
-        window.open(`/emp/update_emp?empId=${empId}`);
+        window.open(`/v/emp/update_emp?empId=${empId}`);
     }
 
     function toCreate() {
-        window.open('/emp/create_emp')
+        window.open('/v/emp/create_emp')
     }
 
     function empInfo(but) {
         var empId = $(but).parent().data('emp-id');
-        window.open(`/api/emp/emp_info?empId=${empId}`);
+        window.open(`/v/emp/emp_info?empId=${empId}`);
     }
 
     //首页

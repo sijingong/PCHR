@@ -1,19 +1,21 @@
 package com.bnt.pchr.controller;
 import com.bnt.pchr.commons.vo.ResponseData;
+import com.bnt.pchr.entity.Department;
 import com.bnt.pchr.entity.Job;
+import com.bnt.pchr.service.IDepartmentService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import com.bnt.pchr.service.IJobService;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 
 @Slf4j
-@RequestMapping("api/job")
+@RequestMapping("job")
 @Controller
 @Api(value = "职位控制器")
 public class JobController {
@@ -22,40 +24,64 @@ public class JobController {
     @Qualifier("jobService")
     private IJobService jobService;
 
+    @Autowired
+    @Qualifier("departmentService")
+    private IDepartmentService departmentService;
+
     @PostMapping("select_list")
     @ResponseBody
-    public ResponseData selectList(){
-        List<Job> jobList = jobService.selectList();
+    public ResponseData selectList(Integer depState){
+        List<Job> jobList = jobService.selectList(depState);
+        for(Job job:jobList){
+            if(job.getDepId()!=null){
+                Department dep = departmentService.selectOne(job.getDepId());
+                job.setDep(dep);
+            }
+        }
         return ResponseData.SUCCESS(jobList);
     }
 
-    @PostMapping("job_info")
-    public ModelAndView jobInfo(Integer jobId,ModelAndView modelAndView){
+    @PostMapping("select_one")
+    @ResponseBody
+    public ResponseData selectOne(Integer jobId){
         Job job = jobService.selectOne(jobId);
-        modelAndView.addObject("job",job);
-        modelAndView.setViewName("job/job_info");
-        return modelAndView;
+        return ResponseData.SUCCESS(job);
+    }
+
+    @PostMapping("to_select")
+    public String toSelect(Integer jobState,Model model){
+        List<Job> jobList = jobService.selectList(jobState);
+        for(Job job:jobList){
+            if(job.getDepId()!=null){
+                Department dep = departmentService.selectOne(job.getDepId());
+                job.setDep(dep);
+            }
+        }
+        model.addAttribute("jobList",jobList);
+        return "job/job_list";
     }
 
     @PostMapping("create_job")
     @ResponseBody
-    public ResponseData createJob(Job job){
-        int check = jobService.check(job.getJobNo());
+    public ResponseData createJob(Job job,Integer userId){
+        int check = jobService.check(job.getJobNo(),job.getJobId());
         if(check>0){
             return ResponseData.FAIL(-1,"该职位已存在");
         }
         int rows = jobService.insert(job);
+        job.setCreateEmpId(userId);
         return ResponseData.SUCCESS(rows);
     }
 
     @PostMapping("update_job")
     @ResponseBody
-    public ResponseData updateJob(Job job){
-        int check = jobService.check(job.getJobNo());
-        if(check>0){
+    public ResponseData updateJob(Job job,Integer userId){
+        int check = jobService.check(job.getJobNo(),job.getJobId());
+        if(check!=0){
             return ResponseData.FAIL(-1,"该职位已存在");
         }
         int rows = jobService.updateById(job);
+        job.setModifyEmpId(userId);
         return ResponseData.SUCCESS(rows);
     }
 

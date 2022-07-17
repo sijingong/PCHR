@@ -66,7 +66,7 @@
             return;
         }
         $.ajax({
-            url: '/api/emp/login',
+            url: '/emp/login',
             type: 'post',
             data: {empNo: empNo, pwd: pwd},
             dataType: 'json',
@@ -75,7 +75,7 @@
                 if (0 != status) {
                     if (990 == status) {
                         alert('请修改初始密码');
-                        window.open('/emp/modify_pwd')
+                        window.open('/v/emp/modify_password')
                     } else if(-1==status){
                         alert('不存在该编号员工！')
                         window.location.reload();
@@ -85,10 +85,10 @@
                     }
                     return;
                 }
-                window.location.href = "/emp/emp_list";
+                window.location.href = "/v/job/job_list";
             },
             error:function (){
-                alert("用户名或密码错误！");
+                alert("服务器异常，登录失败！！");
             }
         });
     }

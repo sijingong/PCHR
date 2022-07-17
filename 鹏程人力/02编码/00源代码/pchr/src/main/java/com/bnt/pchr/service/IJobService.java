@@ -14,7 +14,7 @@ public interface IJobService {
     * 查询,返回对象列表
     * @return
     */
-    List<Job> selectList();
+    List<Job> selectList(Integer jobState);
     
    /**
     * 根据ID查询返回一个对象
@@ -53,5 +53,5 @@ public interface IJobService {
      * @param jobNo
      * @return
      */
-    int check(String jobNo);
+    int check(String jobNo,Integer jobId);
 }

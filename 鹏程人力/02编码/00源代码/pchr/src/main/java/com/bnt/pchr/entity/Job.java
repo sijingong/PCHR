@@ -70,4 +70,7 @@ public class Job implements Serializable {
     @TableField(value = "modify_time")
     private Date modifyTime;
 
+    @TableField(exist = false)
+    private Department dep;
+
 }

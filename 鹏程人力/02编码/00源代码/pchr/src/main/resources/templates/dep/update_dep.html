@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>修改部门</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div th:if="${param.depId!=null}">
+    <form action="#" method="post">
+        <div><span>部门名称:</span><input name="depName" type="text"></div>
+        <div><span>部门编号:</span><input name="depNo" type="text"></div>
+        <div>
+            <span>部门状态:</span>
+            <label><span>使用</span><input name="depState" type="radio" value="1" checked></label>
+            <label><span>停用</span><input name="depState" type="radio" value="9"></label>
+        </div>
+        <div>
+            <span>备注:</span>
+            <textarea name="remark"></textarea>
+        </div>
+        <div>
+            <input type="hidden" name="userId" id="userId"
+                   th:value="${session.emp.empId}">
+            <input type="hidden" name="depId" id="depId" th:value="${param.depId}">
+            <button type="button" onclick="updateDep()">修改</button>
+        </div>
+    </form>
+</div>
+<div th:if="${param.depId==null}">
+    未获取到部门id！！！
+</div>
+</body>
+<script>
+    $(function (){
+        var depId = [[${param.depId}]];
+        <!--    根据id加载部门数据-->
+        $.ajax({
+            url:'/dep/select_one',
+            type:'post',
+            data:{
+                depId:depId,
+            },
+            dataType:'json',
+            cache:false,
+            success:function (jsonData){
+                var status=jsonData.status;
+                if(status!=0){
+                    alert('加载部门数据失败！！服务器发生异常！！')
+                }
+                var dep=jsonData.data;
+                if($.isEmptyObject(dep)){
+                    alert('部门数据为空！！');
+                    window.close();
+                }
+                $('input[name="depName"]').val(dep.depName);
+                $('input[name="depNo"]').val(dep.depNo);
+                $(':radio[name="depState"][value="'+dep.depState+'"]').prop("checked",true);
+                $('textarea[name="remark"]').val(dep.remark);
+                formDataPrev=$('form:first').serialize();
+            },
+            error:function () {
+                alert('加载部门数据失败！！');
+            }
+        })
+    })
+
+    function updateDep(){
+        var formData=$('form:first').serialize();
+        if(formData==formDataPrev){
+            alert("数据未修改！！");
+            return;
+        }
+        $.ajax({
+            url:'/dep/update_dep',
+            type:'post',
+            data:formData,
+            dataType:'json',
+            cache:false,
+            success:function (jsonData){
+                var status=jsonData.status;
+                if(status!=0){
+                    alert('修改失败！！服务器发生异常！！')
+                }
+                var rows=jsonData.data;
+                if(rows==1){
+                    alert('修改部门成功！！');
+                    window.opener.location.reload();
+                    window.close();
+                }else if(rows==0){
+                    alert('部门不存在或已被删除！！');
+                }else {
+                    alert('服务器返回未知的状态');
+                }
+            },
+            error:function () {
+                alert('修改部门失败！！');
+            }
+        })
+    }
+</script>
+</html>

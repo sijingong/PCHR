@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>创建部门</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div>
+    <form action="#" method="post">
+        <div><span>部门名称:</span><input name="depName" type="text"></div>
+        <div><span>部门编号:</span><input name="depNo" type="text"></div>
+        <div>
+            <span>部门状态:</span>
+            <label><span>正常</span><input name="depState" type="radio" value="1" checked></label>
+            <label><span>停用</span><input name="depState" type="radio" value="9"></label>
+        </div>
+        <div>
+            <span>备注:</span>
+            <textarea name="remark"></textarea>
+        </div>
+        <div>
+            <input type="hidden" name="userId" id="userId"
+                    th:value="${session.emp.empId}">
+            <button type="button" onclick="createDep()">创建</button>
+            <button type="reset">重置</button>
+        </div>
+        <script>
+            function createDep() {
+                var formData = $('form:first').serialize();
+                $.ajax({
+                    url: '/dep/create_dep',
+                    type: 'post',
+                    data: formData,
+                    cache: false,
+                    dataType: 'json',
+                    success: function (jsonData) {
+                        var status = jsonData.status;
+                        if (status != 0) {
+                            alert(jsonData.message);
+                            return;
+                        }
+                        var rows = jsonData.data;
+                        if (rows == 1) {
+                            alert('创建成功！');
+                            window.opener.location.reload();
+                            window.close();
+                        } else if (rows == 0) {
+                            alert('创建失败！')
+                        } else {
+                            alert('创建操作返回未知状态！')
+                        }
+                    },
+                    error: function () {
+                        alert('创建部门失败!')
+                    }
+                })
+            }
+        </script>
+    </form>
+</div>
+</body>
+</html>

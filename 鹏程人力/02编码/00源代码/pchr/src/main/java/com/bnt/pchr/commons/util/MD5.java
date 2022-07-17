@@ -21,7 +21,7 @@ public final class MD5 {
 	/**
 	 * MD5加密
 	 * 
-	 * @param str
+	 * @param text
 	 *            加密的字符字符串
 	 * @return MD5加密后的字符串
 	 */

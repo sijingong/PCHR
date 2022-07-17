@@ -81,12 +81,14 @@ public class EmpServiceImpl implements IEmpService {
      */
     @Override
     public int updateById(Emp emp) {
+        emp.setModifyTime(new Date());
         return empMapper.updateById(emp);
     }
 
     @Override
-    public int check(String empNo, String idCard) {
+    public int check(String empNo, String idCard,Integer empId) {
         QueryWrapper<Emp> qw = new QueryWrapper<>();
+        qw.ne("emp_id",empId);
         qw.eq("emp_no",empNo);
         qw.or();
         qw.eq("id_card",idCard);

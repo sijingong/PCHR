@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>修改员工</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<form id="updateForm" action="#">
+    <div>
+        <span>姓名:</span>
+        <input name="empName" type="text">
+    </div>
+    <div>
+        <span>编号:</span>
+        <input name="empNo" type="text">
+    </div>
+    <div>
+        <span>性别:</span>
+        <label><input name="sex" value="1" type="radio" checked>男</label>
+        <label><input name="sex" value="2" type="radio">女</label>
+    </div>
+    <div>
+        <span>手机号:</span>
+        <input name="mobile" type="text">
+    </div>
+    <div>
+        <span>状态:</span>
+        <label><input name="empState" value="1" type="radio" checked>正常</label>
+        <label><input name="empState" value="9" type="radio">停用</label>
+    </div>
+    <div>
+        <span>部门:</span>
+        <select id="depSelect" name="depId"></select>
+    </div>
+    <div>
+        <span>职位:</span>
+        <select id="jobSelect" name="jobId"></select>
+    </div>
+    <div>
+        <span>薪水:</span>
+        <input name="salary" type="number">
+    </div>
+    <div>
+        <span>籍贯:</span>
+        <input name="homeplace" type="text">
+    </div>
+    <div>
+        <span>生日:</span>
+        <input name="birthday" type="date">
+    </div>
+    <div>
+        <span>邮箱:</span>
+        <input name="email" type="text">
+    </div>
+    <div>
+        <span>家庭住址:</span>
+        <input name="homeAddress" type="text">
+    </div>
+    <div>
+        <span>紧急联系人电话:</span>
+        <input name="contactPhone" type="text">
+    </div>
+    <div>
+        <span>qq:</span>
+        <input name="qq" type="text">
+    </div>
+    <div>
+        <span>微信:</span>
+        <input name="wechart" type="text">
+    </div>
+    <div>
+        <span>座位号:</span>
+        <input name="seatCode" type="text">
+    </div>
+    <div>
+        <span>身份证号:</span>
+        <input name="idCard" type="text">
+    </div>
+    <div>
+        <span>备注:</span>
+        <textarea name="remark"></textarea>
+    </div>
+    <div>
+        <input type="hidden" name="userId" id="userId"
+               th:value="${session.emp.empId}">
+        <input name="empId" type="hidden">
+        <button type="button" onclick="updateEmp()">修改</button>
+    </div>
+</form>
+</body>
+<script>
+    $(function(){
+        var empId = [[${param.empId}]];
+        $.ajax({
+            url: '/dep/select_list',
+            type: 'post',
+            dataType: 'json',
+            cache: false,
+            success: function (jsonData) {
+                var status = jsonData.status;
+                if (status != 0) {
+                    alert('加载部门数据失败！！服务器发生异常！！')
+                }
+                var depList = jsonData.data;
+                if ($.isEmptyObject(depList)) {
+                    alert('部门数据为空！！');
+                    window.close();
+                }
+                depList.forEach(function (dep) {
+                    $('#depSelect').append('<option value="' + dep.depId + '">' + dep.depName + '</option>')
+                })
+            },
+            error: function () {
+                alert('加载部门数据失败！！');
+            }
+        })
+        $.ajax({
+            url: '/job/select_list',
+            type: 'post',
+            dataType: 'json',
+            cache: false,
+            success: function (jsonData) {
+                var status = jsonData.status;
+                if (status != 0) {
+                    alert('加载职位数据失败！！服务器发生异常！！')
+                }
+                var jobList = jsonData.data;
+                if ($.isEmptyObject(jobList)) {
+                    alert('职位数据为空！！');
+                    window.close();
+                }
+                jobList.forEach(function (job) {
+                    $('#jobSelect').append('<option value="' + job.jobId + '">' + job.jobName + '</option>')
+                })
+            },
+            error: function () {
+                alert('加载职位数据失败！！');
+            }
+        })
+        $.ajax({
+            url: '/emp/select_one',
+            type: 'post',
+            data: {
+                empId: empId
+            },
+            dataType: 'json',
+            cache: false,
+            success: function (jsonData) {
+                var status = jsonData.status;
+                if (status != 0) {
+                    alert('加载员工数据失败！！服务器发生异常！！')
+                }
+                var emp = jsonData.data;
+                if ($.isEmptyObject(emp)) {
+                    alert('员工数据为空！！');
+                    window.close();
+                }
+                $('input[name="empName"]').val(emp.empName);
+                $('input[name="empNo"]').val(emp.empNo);
+                $(':radio[name="sex"][value="' + emp.sex + '"]').prop("checked", true);
+                $('input[name="mobile"]').val(emp.mobile);
+                $(':radio[name="empState"][value="' + emp.empState + '"]').prop("checked", true);
+                $('#depSelect').val(emp.depId);
+                $('#jobSelect').val(emp.jobId);
+                $('input[name="salary"]').val(emp.salary);
+                $('input[name="homeplace"]').val(emp.homeplace);
+                $('input[name="birthday"]').val(emp.birthday);
+                $('input[name="email"]').val(emp.email);
+                $('input[name="homeAddress"]').val(emp.homeAddress);
+                $('input[name="homeplace"]').val(emp.homeplace);
+                $('input[name="contactPhone"]').val(emp.contactPhone);
+                $('input[name="qq"]').val(emp.qq);
+                $('input[name="wechart"]').val(emp.wechart);
+                $('input[name="seatCode"]').val(emp.seatCode);
+                $('input[name="idCard"]').val(emp.idCard);
+                $('textarea[name="remark"]').val(emp.remark);
+                $('input[name="empId"]').val(emp.empId);
+                formDataPrev=$('form:first').serialize();
+            },
+            error: function () {
+                alert('加载员工数据失败');
+            }
+        })
+    })
+    function updateEmp(){
+        var formData=$('#updateForm').serialize();
+        if(formDataPrev==formData){
+            alert('员工数据未修改');
+            return;
+        }
+        $.ajax({
+            url:'/emp/update_emp',
+            data:formData,
+            type:'post',
+            cache:false,
+            dataType:'json',
+            success:function(jsonData){
+                var status=jsonData.status;
+                if(status!=0){
+                    alert('修改失败！！服务器发生异常！！');
+                }
+                var rows=jsonData.data;
+                if(rows==1){
+                    alert('修改员工成功！！');
+                    window.opener.location.reload();
+                    window.close();
+                }else {
+                    alert('修改员工失败！！');
+                }
+            },
+            error:function(){
+                alert('修改员工失败！！');
+            }
+        })
+    }
+</script>
+</html>

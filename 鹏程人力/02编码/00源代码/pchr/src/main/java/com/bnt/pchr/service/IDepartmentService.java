@@ -13,7 +13,7 @@ public interface IDepartmentService {
     * 查询,返回对象列表
     * @return
     */
-    List<Department> selectList();
+    List<Department> selectList(Integer depState);
     
    /**
     * 根据ID查询返回一个对象
@@ -52,5 +52,5 @@ public interface IDepartmentService {
      * @param depNo
      * @return
      */
-    int check(String depNo);
+    int check(String depNo,Integer depId);
 }

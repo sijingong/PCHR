@@ -1,8 +1,5 @@
 package com.bnt.pchr.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import java.util.List;
-
 import com.bnt.pchr.commons.vo.PageData;
 import com.bnt.pchr.entity.Emp;
 
@@ -66,5 +63,5 @@ public interface IEmpService {
      * @param idCard
      * @return
      */
-    int check(String empNo,String idCard);
+    int check(String empNo,String idCard,Integer empId);
 }

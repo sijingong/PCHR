@@ -55,7 +55,7 @@
         </div>
         <div>
             <span>家庭住址:</span>
-            <input name="email" type="text">
+            <input name="homeAddress" type="text">
         </div>
         <div>
             <span>紧急联系人电话:</span>
@@ -82,6 +82,8 @@
             <textarea name="remark"></textarea>
         </div>
         <div>
+            <input type="hidden" name="empId" id="empId"
+                   th:value="${session.emp.empId}">
             <button type="button" onclick="createEmp()">创建</button>
         </div>
     </form>
@@ -89,7 +91,7 @@
 <script>
     $(function(){
         $.ajax({
-            url: '/api/dep/select_list',
+            url: '/dep/select_list',
             type: 'post',
             dataType: 'json',
             cache: false,
@@ -112,7 +114,7 @@
             }
         })
         $.ajax({
-            url: '/api/job/select_list',
+            url: '/job/select_list',
             type: 'post',
             dataType: 'json',
             cache: false,
@@ -138,7 +140,7 @@
     function createEmp(){
         var formData=$('#createForm').serialize();
         $.ajax({
-            url:'/api/emp/create_emp',
+            url:'/emp/create_emp',
             data:formData,
             type:'post',
             cache:false,
@@ -151,7 +153,8 @@
                 var rows=jsonData.data;
                 if(rows==1){
                     alert('创建员工成功！！');
-                    window.open('/emp/emp_list');
+                    window.opener.location.reload();
+                    window.close();
                 }else if(rows==2){
                     alert('该员工已存在！！');
                 }else {

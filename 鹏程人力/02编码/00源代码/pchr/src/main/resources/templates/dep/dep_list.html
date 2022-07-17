@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>部门列表</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<form action="/dep/to_select" method="post">
+    <div>
+        <span>部门状态:</span>
+        <label><input name="depState" type="radio" value="0">不限</label>
+        <label><input name="depState" type="radio" value="1">使用中</label>
+        <label> <input name="depState" type="radio" value="9">已停用</label>
+    </div>
+    <div>
+        <button type="submit">查询</button>
+        <button onclick="toCreate()">创建</button>
+        <script>
+            var depState = [[${param.depState!=null?param.depState:0}]];
+            $(':radio[name="depState"][value="' + depState + '"]').prop("checked", true);
+        </script>
+    </div>
+</form>
+<!--显示查询数据-->
+<table>
+    <thead>
+    <tr>
+        <th>序号</th>
+        <th>编号</th>
+        <th>名称</th>
+        <th>创建时间</th>
+        <th>状态</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody th:if="${#lists.isEmpty(depList)}">
+    <tr>
+        <td colspan="7" style="color: red;text-align: center">未查询到数据</td>
+    </tr>
+    </tbody>
+    <tbody th:unless="${#lists.isEmpty(depList)}">
+    <tr th:each="dep,v:${depList}">
+        <td style="text-align: center" th:text="${v.count}"></td>
+        <td style="text-align: center" th:text="${dep.depNo}"></td>
+        <td style="text-align: center" th:text="${dep.depName}"></td>
+        <td style="text-align: center"
+            th:text="${#lists.isEmpty(dep.createTime)?'-':#dates.format(dep.createTime,'yyyy-MM-dd HH:mm:ss')}"></td>
+        <td style="text-align: center" th:switch="${dep.depState}">
+            <span th:case="1" style="color: blue">使用中</span>
+            <span th:case="9" style="color: red">已停用</span>
+            <span th:case="*" style="color: gray">未知</span>
+        </td>
+        <td style="text-align: center" th:data-dep-name="${dep.depName}" th:data-dep-id="${dep.depId}">
+            <a href="#" style="color: orange" onclick="deleteDep(this)">删除</a>
+            <a href="#" style="color: pink" onclick="updateDep(this)">修改</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<script>
+    function deleteDep(but) {
+        var depName = $(but).parent().data('dep-name');
+        var depId = $(but).parent().data('dep-id');
+        if (!window.confirm(`确定要删除【${depName}】吗`)) {
+            return;
+        }
+        $.ajax({
+            url: '/dep/delete_dep',
+            type: 'post',
+            data: {
+                depId: depId
+            },
+            dataType: 'json',
+            cache: false,
+            success: function (jsonData) {
+                var status = jsonData.status;
+                if (status != 0) {
+                    alert('删除失败！！服务器发生异常！！')
+                }
+                var rows = jsonData.data;
+                if (rows == 1) {
+                    alert('删除部门成功！！');
+                    window.location.reload();
+                } else if (rows == 0) {
+                    alert('部门不存在或已被删除！！');
+                } else {
+                    alert('服务器返回未知的状态');
+                }
+            },
+            error: function () {
+                alert('删除部门失败！')
+            }
+        })
+    }
+
+    function updateDep(but) {
+        var depId = $(but).parent().data('dep-id');
+        //    打开修改页面
+        window.open(`/v/dep/update_dep?depId=${depId}`);
+    }
+
+    function toCreate() {
+        window.open('/v/dep/create_dep');
+    }
+</script>
+</body>
+</html>

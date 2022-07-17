@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>修改职位</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<div th:if="${param.jobId!=null}">
+    <form action="#" method="post">
+        <div><span>职位名称:</span><input name="jobName" type="text"></div>
+        <div><span>职位编号:</span><input name="jobNo" type="text"></div>
+        <div>
+            <span>职位状态:</span>
+            <label><span>使用</span><input name="jobState" type="radio" value="1" checked></label>
+            <label><span>停用</span><input name="jobState" type="radio" value="9"></label>
+        </div>
+        <div>
+            <span>备注:</span>
+            <textarea name="remark"></textarea>
+        </div>
+        <div>
+            <input type="hidden" name="userId" id="userId"
+                   th:value="${session.emp.empId}">
+            <input type="hidden" name="jobId" id="jobId" th:value="${param.jobId}">
+            <button type="button" onclick="updatejob()">修改</button>
+        </div>
+    </form>
+</div>
+<div th:if="${param.jobId==null}">
+    未获取到职位id！！！
+</div>
+</body>
+<script>
+    $(function (){
+        var jobId = [[${param.jobId}]];
+        <!--    根据id加载职位数据-->
+        $.ajax({
+            url:'/job/select_one',
+            type:'post',
+            data:{
+                jobId:jobId,
+            },
+            dataType:'json',
+            cache:false,
+            success:function (jsonData){
+                var status=jsonData.status;
+                if(status!=0){
+                    alert('加载职位数据失败！！服务器发生异常！！')
+                }
+                var job=jsonData.data;
+                if($.isEmptyObject(job)){
+                    alert('职位数据为空！！');
+                    window.close();
+                }
+                $('input[name="jobName"]').val(job.jobName);
+                $('input[name="jobNo"]').val(job.jobNo);
+                $(':radio[name="jobState"][value="'+job.jobState+'"]').prop("checked",true);
+                $('textarea[name="remark"]').val(job.remark);
+                formDataPrev=$('form:first').serialize();
+            },
+            error:function () {
+                alert('加载职位数据失败！！');
+            }
+        })
+    })
+
+    function updatejob(){
+        var formData=$('form:first').serialize();
+        if(formData==formDataPrev){
+            alert("数据未修改！！");
+            return;
+        }
+        $.ajax({
+            url:'/job/update_job',
+            type:'post',
+            data:formData,
+            dataType:'json',
+            cache:false,
+            success:function (jsonData){
+                var status=jsonData.status;
+                if(status!=0){
+                    alert('该职位已存在！！');
+                }
+                var rows=jsonData.data;
+                if(rows==1){
+                    alert('修改职位成功！！');
+                    window.opener.location.reload();
+                    window.close();
+                }else if(rows==0){
+                    alert('职位不存在或已被删除！！');
+                }else {
+                    alert('服务器返回未知的状态');
+                }
+            },
+            error:function () {
+                alert('修改职位失败！！');
+            }
+        })
+    }
+</script>
+</html>

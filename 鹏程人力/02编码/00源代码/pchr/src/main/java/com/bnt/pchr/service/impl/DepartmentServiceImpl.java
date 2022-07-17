@@ -16,8 +16,11 @@ public class DepartmentServiceImpl implements IDepartmentService {
     private DepartmentMapper departmentMapper;
 
     @Override
-    public List<Department> selectList(){
+    public List<Department> selectList(Integer depState){
         QueryWrapper<Department> qw = new QueryWrapper<>();
+        if(depState!=null&&depState!=0){
+            qw.eq("dep_state",depState);
+        }
         return departmentMapper.selectList(qw);
     }
 
@@ -46,9 +49,10 @@ public class DepartmentServiceImpl implements IDepartmentService {
     }
 
     @Override
-    public int check(String depNo) {
+    public int check(String depNo,Integer depId) {
         QueryWrapper<Department> qw = new QueryWrapper<>();
         qw.eq("dep_no",depNo);
+        qw.ne("dep_id",depId);
         return departmentMapper.selectCount(qw).intValue();
     }
 }
