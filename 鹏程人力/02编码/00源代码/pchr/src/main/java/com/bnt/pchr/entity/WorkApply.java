@@ -70,4 +70,7 @@ public class WorkApply implements Serializable {
     @TableField(value = "appr_emp_id")
     private Integer apprEmpId;
 
+    @ApiModelProperty(value = "审批时间")
+    @TableField(value = "appr_time")
+    private Date apprTime;
 }

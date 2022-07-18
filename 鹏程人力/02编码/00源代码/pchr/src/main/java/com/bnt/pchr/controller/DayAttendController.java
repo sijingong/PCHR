@@ -82,7 +82,7 @@ public class DayAttendController {
      */
     @PostMapping("select_list")
     @ResponseBody
-    public ResponseData selectDayAttendByTime( String kd, Integer attendState,  Integer empId,  Date startTime, Date endTime, PageData pageData,Long current,long size){
+    public ResponseData selectDayAttendByTime( String kd, Integer attendState,  Integer empId,  Date startTime, Date endTime, PageData pageData,int current,int size){
         pageData.addCriteria("kd",kd);
         pageData.addCriteria("attendState",attendState);
         pageData.addCriteria("empId",empId);
@@ -90,7 +90,6 @@ public class DayAttendController {
         pageData.addCriteria("endTime",endTime);
         pageData.setCurrent(current);
         pageData.setSize(size);
-        pageData.setCriteriaMap(pageData.getCriteriaMap());
         //进行分页查询
         List<DayAttendVO> attendVOList=dayAttendService.selectPage(pageData).getRecords();
         return ResponseData.SUCCESS(attendVOList);

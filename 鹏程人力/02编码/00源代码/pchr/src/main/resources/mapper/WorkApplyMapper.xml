@@ -3,4 +3,61 @@
         PUBLIC "-//mybatis.org//DTD Mapper3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.bnt.pchr.mapper.WorkApplyMapper">
+    <select id="selectApplyList" resultType="workApply">
+        SELECT w.`apply_id`      as `applyId`,
+               w.`emp_id`        as `empId`,
+               w.`create_time`   as `createTime`,
+               w.`apply_state`   as `applyState`,
+               w.`start_time`    as `startTime`,
+               w.`end_time`      as `endTime`,
+               w.`overtime_type` as `overtimeType`,
+               w.`cost_type`     as `costType`,
+               w.`remark`,
+               e.`emp_name`      as empName,
+               e.`emp_no`        as empNo,
+               e.`mobile`,
+               w.`appr_emp_id`   as apprEmpId
+        FROM `work_apply` as w
+                 right join `emp` as e on
+                e.`emp_id` = w.`emp_id`
+        <where>
+            <if test="@cn.hutool.core.util.StrUtil@isNotEmpty(criteriaMap.kd)">
+                      (e.`emp_no` like '%${criteriaMap.kd}%'
+                    or e.`emp_name` like '%${criteriaMap.kd}%'
+                    or e.`mobile` like '%${criteriaMap.kd}%')
+            </if>
+            <if test="@cn.hutool.core.util.StrUtil@isNotEmpty(criteriaMap.costType)">
+                   and (w.`cost_type`=#{criteriaMap.costType,jdbcType=INTEGER})
+            </if>
+            <if test="criteriaMap.empId!=null and ''!=criteriaMap.empId">
+                   and (e.`emp_id`=#{criteriaMap.empId,jdbcType=INTEGER})
+            </if>
+            <if test="@cn.hutool.core.util.StrUtil@isNotEmpty(criteriaMap.applyState)">
+                  and  (w.`apply_state`=#{criteriaMap.applyState,jdbcType=INTEGER})
+            </if>
+            <if test="@cn.hutool.core.util.StrUtil@isNotEmpty(criteriaMap.overtimeType)">
+                   and  (w.`overtime_type`=#{criteriaMap.overtimeType,jdbcType=INTEGER})
+            </if>
+        </where>
+    </select>
+    <select id="selectByCondition" resultType="workApply">
+        <![CDATA[
+        SELECT `apply_id` as `applyId`,
+               `emp_id` as `empId`,
+               `create_time` as `createTime`,
+               `apply_state` as `applyState`,
+               `start_time` as `startTime`,
+               `end_time` as `endTime`,
+               `overtime_type` as `overtimeType`,
+               `cost_type` as `costType`,
+               `remark`,
+               `appr_emp_id` as apprEmpId FROM `work_apply`
+        ]]>
+        <where>
+            <if test="@cn.hutool.core.util.StrUtil@isNotEmpty()">
+                <![CDATA[
+]]>
+            </if>
+        </where>
+    </select>
 </mapper>
