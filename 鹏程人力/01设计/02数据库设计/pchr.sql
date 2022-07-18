@@ -210,10 +210,10 @@ CREATE TABLE `notice_emp`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '公告员工表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for resume_template
+-- Table structure for contract_template
 -- ----------------------------
-DROP TABLE IF EXISTS `resume_template`;
-CREATE TABLE `resume_template`  (
+DROP TABLE IF EXISTS `contract_template`;
+CREATE TABLE `contract_template`  (
   `temp_id` int NOT NULL AUTO_INCREMENT COMMENT '模板ID',
   `temp_file_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '模板文件路径',
   `temp_type` int NULL DEFAULT NULL COMMENT '模板类型(1:试用期;2:正式;3:终身;4:临时)',
