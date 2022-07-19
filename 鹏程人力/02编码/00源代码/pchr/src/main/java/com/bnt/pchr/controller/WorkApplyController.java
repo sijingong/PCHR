@@ -87,6 +87,6 @@ public class WorkApplyController  {
         pageData.setCurrent(current);
         pageData.setSize(size);
         mv.addObject("workApplyList",workApplyService.selectPage(pageData));
-        return ResponseData.SUCCESS(workApplyService.selectPage(pageData));
+        return ResponseData.SUCCESS(workApplyService.selectPage(pageData).getRecords());
     }
 }

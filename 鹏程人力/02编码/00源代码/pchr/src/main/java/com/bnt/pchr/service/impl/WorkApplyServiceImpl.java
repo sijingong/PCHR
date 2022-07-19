@@ -52,6 +52,7 @@ public class WorkApplyServiceImpl implements IWorkApplyService {
         if(startTime.getTime()>endTime.getTime()){
             return 9;//错误的时间
         }
+        workApply.setApplyState(1);//提交申请后设置申请状态为未处理状态
         return workApplyMapper.insert(workApply);
     }
 

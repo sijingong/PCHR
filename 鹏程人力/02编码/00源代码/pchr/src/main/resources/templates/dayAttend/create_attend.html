@@ -1,0 +1,64 @@
+<form action="/dayAttend/select_one" method="post">
+    <div id="myForm">
+        <div th:data-emp-id="${empId}">
+            <button type="button" name="nowTime" class="btn btn-primary" th:text="上班打卡"
+                    onclick="nowTime()"></button>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    /**
+     * 获取当前打卡时间
+     */
+    function nowTime() {
+        var date = new Date();
+        var year = date.getFullYear();
+        var month = date.getMonth() + 1;
+        var dayOfMonth = date.getDate();
+        var hour = date.getHours();
+        var minutes = date.getMinutes();
+        var seconds = date.getSeconds();
+        nowTime = `${year}-${month}-${dayOfMonth} ${hour}:${minutes}:${seconds}`;
+        //查
+        date = new Date(Date.parse(nowTime.replace(/-/g, "/")));
+        if (date.getTime() > new Date(year, month, dayOfMonth, 9, 0, 0).getTime() && date.getTime() < new Date(year, month, dayOfMonth, 12, 0, 0).getTime()) {
+            alert('您的上班状态已超时!');
+        } else if (date.getTime() > new Date(year, month, dayOfMonth, 12, 0, 0).getTime()) {
+            alert('您当前已不能打卡');
+        }
+    }
+
+    /**
+     * 打卡
+     */
+    function createDayAttend(but) {
+        var empId = $(but).parent().data('emp-id');
+        $.ajax({
+            url: '/dayAttend/create',
+            type: 'post',
+            data: {empId: empId},
+            dataType: 'json',
+            cache: false,
+            success: function (jsonData) {
+                var status = jsonData.status;
+                if (status != 0) {
+                    alert('打卡失败,服务器异常!请联系相关管理员');
+                }
+                var rows = jsonData.data;
+                if (rows == 1) {
+                    alert('打卡成功!');
+                    window.location.reload();
+                    $.ajax({
+                        url: '',
+                    });
+                } else if (rows == 0) {
+                    alert('打卡失败!');
+                } else {
+                    alert(jsonData.message());
+                }
+            }, error: function () {
+                alert('打卡失败,服务器返回未知的错误!');
+            }
+        });
+    }
+</script>

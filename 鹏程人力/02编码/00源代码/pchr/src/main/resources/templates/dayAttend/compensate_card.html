@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:include="common/public::head('打卡列表')">
+    <meta charset="UTF-8">
+    <title>补卡</title>
+</head>
+<body>
+<ol class="breadcrumb">
+    <li>当前位置:补卡界面</li>
+</ol>
+<div class="container-fluid" style="padding: 0px">
+    <div class="well">
+        <table>
+            <thead>
+            <tr>
+                <th class="text-center">员工姓名</th>
+                <th class="text-center">员工编号</th>
+                <th class="text-center">所属部门</th>
+                <th class="text-center">已补卡次数</th>
+                <th class="text-center">操作</th>
+            </tr>
+            </thead>
+            <tbody th:if="${}">
+            <tr>
+                <td style="color: #2a3e93;text-align: center" colspan="5">未查询到员工数据</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

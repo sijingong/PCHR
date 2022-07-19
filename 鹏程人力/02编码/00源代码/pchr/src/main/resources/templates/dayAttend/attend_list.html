@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:include="common/public::head('打卡列表')">
+    <meta charset="UTF-8">
+    <title>打卡列表</title>
+</head>
+<body>
+<ol class="breadcrumb">
+    <li>当前位置:打卡列表</li>
+</ol>
+<div class="container-fluid" style="padding-left: 0">
+    <div class="well">
+        <form action="/dayAttend/select_list" method="post">
+            <div class="row" style="color: #985f0d">
+                <div class="col-md-1">
+                    <span style="font-size: 28px">关键字:</span>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" id="kd" name="kd" class="form-control" th:value="${param.kd}"
+                           placeholder="请输入员工姓名、编码、手机号码、身份证等信息">
+                </div>
+                <button type="submit" style="border-radius: 50px">查询</button>
+                <!--导入分页信息公共模板,10表示每一页显示的记录条数,根据实际情况跳转-->
+                <div>
+                    <div th:replace="common/public::page(10)">
+                        <button type="submit" class="btn btn-primary" title="查询简历"><span
+                                class="glyphicon glyphicon-search"></span></button>
+                        <button type="button" class="btn btn-primary" title="创建简历" onclick="showAddResumeDialog()"><span
+                                class="glyphicon glyphicon-plus"></span></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div th:if="${attendVOList==null}"></div>
+<div th:unless="${attendVOList==null}">
+    <table class="table table-hover table-striped table-bordered">
+        <thead>
+        <tr class="info">
+            <th class="text-center">序号</th>
+            <th class="text-center">员工姓名</th>
+            <th class="text-center">员工编号</th>
+            <th class="text-center">打卡状态</th>
+            <th class="text-center">手机号码</th>
+            <th class="text-center">操作</th>
+        </tr>
+        </thead>
+        <tbody th:if="${#lists.isEmpty(attendVOList.records)}">
+        <tr>
+            <td style="color: #0000ff;text-align: center" colspan="6">未查询到任何员工信息</td>
+        </tr>
+        </tbody>
+        <tbody th:unless="${#lists.isEmpty(attendVOList.records)}" th:each="DayAttendVO,v:${attendVOList.records}">
+        <tr>
+            <td th:value="${DayAttendVO.empId}" hidden></td>
+            <td th:text="${v.count}"></td>
+            <td th:text="${DayAttendVO.empName}"></td>
+            <td th:text="${DayAttendVO.empNo}"></td>
+            <td th:text="${DayAttendVO.attendState}"></td>
+            <td th:text="${DayAttendVO.mobile}"></td>
+            <td th:data-id="${DayAttendVO.empId}">
+                <button type="button" class="btn btn-danger btn-sm" title="查看详情" onclick="goEmpInfo(this)">
+                    <span class="glyphicon glyphicon-remove">&nbsp;&nbsp;</span>
+                </button>
+                <button type="button" class="btn bg-primary btn-sm" title="补卡" onclick="goCompensate(this)">
+                    <span class="glyphicon glyphicon-plus">&nbsp;&nbsp;</span>
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+<script>
+    /**
+     * 进去补卡界面
+     */
+    function goCompensate(but) {
+        var empId = $(but).parent().data("id");
+        window.location.href('/v/dayAttend/compensate_card?');
+    }
+    /**
+     * 去员工详细信息页面
+     */
+    function goEmpInfo(but) {
+        var empId = $(but).parent().data("id");
+        window.open(`/v/emp/emp_info?empId=${empId}`);
+    }
+</script>
+</html>

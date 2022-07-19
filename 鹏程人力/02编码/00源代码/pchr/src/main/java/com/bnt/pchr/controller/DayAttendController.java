@@ -2,7 +2,6 @@ package com.bnt.pchr.controller;
 import com.bnt.pchr.commons.vo.PageData;
 import com.bnt.pchr.commons.vo.ResponseData;
 import com.bnt.pchr.entity.DayAttend;
-import com.bnt.pchr.entity.DayAttendVO;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import com.bnt.pchr.service.IDayAttendService;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.*;
 
@@ -30,7 +30,7 @@ public class DayAttendController {
      */
     @PostMapping("create")
     @ResponseBody
-    public ResponseData createDayAttend(DayAttend dayAttend){
+    public ResponseData createDayAttend(DayAttend dayAttend,ModelAndView mv){
         int rows= dayAttendService.insert(dayAttend);
         if(-1==rows){
             return ResponseData.FAIL(100301,"您无法在下班后进行打卡!");
@@ -81,8 +81,7 @@ public class DayAttendController {
      * @return
      */
     @PostMapping("select_list")
-    @ResponseBody
-    public ResponseData selectDayAttendByTime( String kd, Integer attendState,  Integer empId,  Date startTime, Date endTime, PageData pageData,int current,int size){
+    public ModelAndView selectDayAttendByTime( String kd, Integer attendState,  Integer empId,  Date startTime, Date endTime, PageData pageData,int current,int size){
         pageData.addCriteria("kd",kd);
         pageData.addCriteria("attendState",attendState);
         pageData.addCriteria("empId",empId);
@@ -91,8 +90,11 @@ public class DayAttendController {
         pageData.setCurrent(current);
         pageData.setSize(size);
         //进行分页查询
-        List<DayAttendVO> attendVOList=dayAttendService.selectPage(pageData).getRecords();
-        return ResponseData.SUCCESS(attendVOList);
+        PageData<DayAttend> attendVOList=dayAttendService.selectPage(pageData);
+        ModelAndView modelAndView=new ModelAndView();
+        modelAndView.addObject("attendVOList",attendVOList);
+        modelAndView.setViewName("/dayAttend/attend_list");
+        return modelAndView;
     }
 
     /**
