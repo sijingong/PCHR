@@ -35,4 +35,61 @@
             <![CDATA[order by ${orderBySQL}]]>
         </if>
     </select>
+    <select id="selectList" resultType="leave">
+        <![CDATA[
+        select l.`leave_id` as `leaveId`,
+               l.`create_time` as `createTime`,
+               `end_time`    as  `endTime`,
+               l.`remark`      as  `remark`,
+               l.`emp_id`    as  `empId`,
+               `apply_state` as  `applyState`,
+               `apply_time`  as  `applyTime`,
+               `leave_type`  as  `leaveType`,
+               `destory_state` as `destoryState`,
+               `destory_time`  as `destoryTime`,
+				l.`approve_emp_id` as `approveEmpId`,
+			   `leave_approve_id` as `leaveApproveId`,
+				`approve_time` as `approveTime`,
+				`approve_state` as `approveState`,
+				a.`approve_emp_id` as `approveEmpId`,
+				a.`leave_id` as `leaveId`,
+				emp.`emp_id` as `empId`,
+				`emp_name` as `empName`,
+    			`emp_no` as `empNo`,
+				`sex` as `sex`,
+				`emp_state` as `empState`,
+				emp.`dep_id` as `depId`,
+				emp.`job_id` as `jobId`,
+				`salary` as `salary`,
+				j.`job_id` as `jobId`,
+			    `job_name` as `jobName`,
+				j.`dep_id` as `depId`,
+				`job_state` as `jobState`,
+				dep.`dep_id` as `depId`,
+			    `dep_name` as `depName`,
+				`dep_state` as `depState`
+        from `emp_leave` as l
+        inner join  `leave_approve`	as a	on l.`leave_id`=a.`leave_id`
+	    inner join  `emp` as emp on a.`approve_emp_id`=emp.`emp_id`
+	    inner join  `job` as j   on  emp.`job_id`=j.`job_id`
+	    inner join  `department` as dep on j.`dep_id`=dep.`dep_id`
+        ]]>
+        <where>
+            <if test="criteriaMap.empId!=null">
+                <![CDATA[and emp.`emp_id`=#{criteriaMap.empId,jdbcType=INTEGER}]]>
+            </if>
+            <if test="criteriaMap.applyState!=null">
+                <![CDATA[and `apply_state`=#{criteriaMap.applyState,jdbcType=INTEGER}]]>
+            </if>
+            <if test="criteriaMap.leaveType!=null">
+                <![CDATA[and `leave_type`=#{criteriaMap.leaveType,jdbcType=INTEGER}]]>
+            </if>
+            <if test="criteriaMap.destoryState!=null">
+                <![CDATA[and `destory_state`=#{criteriaMap.destoryState,jdbcType=INTEGER}]]>
+            </if>
+        </where>
+        <if test="@cn.hutool.core.util.StrUtil@isNotEmpty(orderBySQL)">
+            <![CDATA[order by ${orderBySQL}]]>
+        </if>
+    </select>
 </mapper>

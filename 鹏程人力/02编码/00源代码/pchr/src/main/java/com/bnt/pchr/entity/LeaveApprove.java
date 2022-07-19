@@ -47,8 +47,8 @@ public class LeaveApprove implements Serializable {
     private String remark;
 
     @ApiModelProperty(value = "审批人ID")
-    @TableField(value = "apply_emp_id")
-    private Integer applyEmpId;
+    @TableField(value = "approve_emp_id")
+    private Integer approveEmpId;
 
     @ApiModelProperty(value = "审批流水(备用)")
     @TableField(value = "apply_trans_no")

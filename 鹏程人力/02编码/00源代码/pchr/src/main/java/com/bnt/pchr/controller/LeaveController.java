@@ -177,6 +177,7 @@ public class LeaveController  {
         pageData.setCurrent(current);
         pageData.setOrderRuleList(orderRules);
         pageData.addCriteria("destoryState",destoryState);
+        System.out.println(leaveService.selectPage(pageData));
         return ResponseData.SUCCESS(leaveService.selectPage(pageData));
     }
 

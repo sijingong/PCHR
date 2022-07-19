@@ -17,4 +17,11 @@ public interface LeaveMapper extends BaseMapper<Leave> {
      * @return
      */
     PageData<Leave> selectPage(PageData<Leave> pageData);
+
+    /**
+     * 多条件分页分页查询
+     * @param pageData
+     * @return
+     */
+    PageData<Leave> selectList(PageData<Leave> pageData);
 }

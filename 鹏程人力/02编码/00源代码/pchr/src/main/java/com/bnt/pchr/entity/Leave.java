@@ -70,4 +70,7 @@ public class Leave implements Serializable {
     @TableField(value = "destory_time")
     private Date destoryTime;
 
+    @ApiModelProperty(value = "审核人ID")
+    @TableField(value = "approve_emp_id")
+    private Integer approveEmpId;
 }

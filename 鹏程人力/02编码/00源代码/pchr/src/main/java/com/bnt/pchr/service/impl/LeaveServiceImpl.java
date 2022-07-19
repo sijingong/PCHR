@@ -28,7 +28,7 @@ public class LeaveServiceImpl implements ILeaveService {
 
     @Override
     public PageData<Leave> selectPage(PageData<Leave> pageData) {
-        return leaveMapper.selectPage(pageData);
+        return leaveMapper.selectList(pageData);
     }
 
     @Override
