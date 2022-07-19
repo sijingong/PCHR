@@ -15,6 +15,11 @@ public class DepartmentServiceImpl implements IDepartmentService {
     @Qualifier("departmentMapper")
     private DepartmentMapper departmentMapper;
 
+    /**
+     * 查询部门列表
+     * @param depState
+     * @return
+     */
     @Override
     public List<Department> selectList(Integer depState){
         QueryWrapper<Department> qw = new QueryWrapper<>();
@@ -24,6 +29,11 @@ public class DepartmentServiceImpl implements IDepartmentService {
         return departmentMapper.selectList(qw);
     }
 
+    /**
+     * 根据id查询
+     * @param depId
+     * @return
+     */
     @Override
     public Department selectOne(Integer depId) {
         QueryWrapper<Department> qw = new QueryWrapper<>();
@@ -31,23 +41,44 @@ public class DepartmentServiceImpl implements IDepartmentService {
         return departmentMapper.selectOne(qw);
     }
 
+    /**
+     * 根据id删除
+     * @param depId
+     * @return
+     */
     @Override
     public int deleteById(Integer depId) {
         return departmentMapper.deleteById(depId);
     }
 
+    /**
+     * 添加部门
+     * @param  department
+     * @return
+     */
     @Override
     public int insert(Department department) {
         department.setCreateTime(new Date());
         return departmentMapper.insert(department);
     }
 
+    /**
+     * 修改部门
+     * @param department
+     * @return
+     */
     @Override
     public int updateById(Department department) {
         department.setModifyTime(new Date());
         return departmentMapper.updateById(department);
     }
 
+    /**
+     * 查重
+     * @param depNo
+     * @param depId
+     * @return
+     */
     @Override
     public int check(String depNo,Integer depId) {
         QueryWrapper<Department> qw = new QueryWrapper<>();

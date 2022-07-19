@@ -28,6 +28,11 @@ public class JobController {
     @Qualifier("departmentService")
     private IDepartmentService departmentService;
 
+    /**
+     * 可选根据部门状态查询员工列表
+     * @param depState
+     * @return
+     */
     @PostMapping("select_list")
     @ResponseBody
     public ResponseData selectList(Integer depState){
@@ -41,6 +46,11 @@ public class JobController {
         return ResponseData.SUCCESS(jobList);
     }
 
+    /**
+     * 根据id查找一个职位
+     * @param jobId
+     * @return
+     */
     @PostMapping("select_one")
     @ResponseBody
     public ResponseData selectOne(Integer jobId){
@@ -48,6 +58,12 @@ public class JobController {
         return ResponseData.SUCCESS(job);
     }
 
+    /**
+     * 跳转到职位列表
+     * @param jobState
+     * @param model
+     * @return
+     */
     @PostMapping("to_select")
     public String toSelect(Integer jobState,Model model){
         List<Job> jobList = jobService.selectList(jobState);
@@ -61,6 +77,12 @@ public class JobController {
         return "job/job_list";
     }
 
+    /**
+     * 创建职位列表
+     * @param job
+     * @param userId
+     * @return
+     */
     @PostMapping("create_job")
     @ResponseBody
     public ResponseData createJob(Job job,Integer userId){
@@ -73,6 +95,12 @@ public class JobController {
         return ResponseData.SUCCESS(rows);
     }
 
+    /**
+     * 更新职位列表
+     * @param job
+     * @param userId
+     * @return
+     */
     @PostMapping("update_job")
     @ResponseBody
     public ResponseData updateJob(Job job,Integer userId){
@@ -85,6 +113,11 @@ public class JobController {
         return ResponseData.SUCCESS(rows);
     }
 
+    /**
+     * 删除职位
+     * @param jobId
+     * @return
+     */
     @PostMapping("delete_job")
     @ResponseBody
     public ResponseData deleteJob(Integer jobId){

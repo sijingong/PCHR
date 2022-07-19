@@ -85,6 +85,13 @@ public class EmpServiceImpl implements IEmpService {
         return empMapper.updateById(emp);
     }
 
+    /**
+     * 查重
+     * @param empNo
+     * @param idCard
+     * @param empId
+     * @return
+     */
     @Override
     public int check(String empNo, String idCard,Integer empId) {
         QueryWrapper<Emp> qw = new QueryWrapper<>();

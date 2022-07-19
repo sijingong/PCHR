@@ -40,6 +40,18 @@ public class EmpController {
     @Qualifier("departmentService")
     private IDepartmentService departmentService;
 
+    /**
+     * 分页查询，根据关键字、工资、部门id、职位id
+     * @param kd
+     * @param floor
+     * @param ceil
+     * @param emp
+     * @param pageData
+     * @param jobState
+     * @param depState
+     * @param model
+     * @return
+     */
     @PostMapping("select_page")
     public String selectPage(String kd, Integer floor, Integer ceil, Emp emp, PageData<Emp> pageData, Integer jobState, Integer depState, Model model) {
         HashMap map = new HashMap<String, Object>();
@@ -71,6 +83,27 @@ public class EmpController {
         return "emp/emp_list";
     }
 
+    /**
+     * 根据id查一个员工
+     * @param empId
+     * @return
+     */
+    @GetMapping("to_select")
+    public String toSelect(Integer empId,Model model) {
+        Emp emp = empService.selectOne(empId);
+        Job job = jobService.selectOne(emp.getJobId());
+        emp.setJob(job);
+        Department dep = departmentService.selectOne(emp.getDepId());
+        emp.setDep(dep);
+        model.addAttribute("emp",emp);
+        return "emp/emp_info";
+    }
+
+    /**
+     * 根据id查一个员工
+     * @param empId
+     * @return
+     */
     @PostMapping("select_one")
     @ResponseBody
     public ResponseData selectOne(Integer empId) {
@@ -82,6 +115,13 @@ public class EmpController {
         return ResponseData.SUCCESS(emp);
     }
 
+    /**
+     * 更新员工状态
+     * @param empId
+     * @param empState
+     * @param userId
+     * @return
+     */
     @GetMapping("update_state")
     @ResponseBody
     public ResponseData updateState(@RequestParam Integer empId, @RequestParam Integer empState, Integer userId) {
@@ -93,6 +133,11 @@ public class EmpController {
         return ResponseData.SUCCESS(rows);
     }
 
+    /**
+     * 重置密码
+     * @param empId
+     * @return
+     */
     @GetMapping("reset_password")
     @ResponseBody
     public ResponseData resetPassword(@RequestParam Integer empId) {
@@ -104,6 +149,13 @@ public class EmpController {
         return ResponseData.SUCCESS(rows);
     }
 
+    /**
+     * 登录
+     * @param empNo
+     * @param pwd
+     * @param session
+     * @return
+     */
     @PostMapping("login")
     @ResponseBody
     public ResponseData login(@RequestParam String empNo, @RequestParam String pwd, HttpSession session) {
@@ -124,12 +176,25 @@ public class EmpController {
         }
     }
 
+    /**
+     * 登出
+     * @param empId
+     * @param model
+     * @param session
+     * @return
+     */
     @PostMapping("logout")
     public String logout(@RequestParam String empId, Model model, HttpSession session) {
         session.removeAttribute("emp");
         return "login";
     }
 
+    /**
+     * 新建员工
+     * @param emp
+     * @param userId
+     * @return
+     */
     @PostMapping("create_emp")
     @ResponseBody
     public ResponseData createEmp(Emp emp, Integer userId) {
@@ -145,6 +210,12 @@ public class EmpController {
         return ResponseData.SUCCESS(rows);
     }
 
+    /**
+     * 更新员工
+     * @param emp
+     * @param userId
+     * @return
+     */
     @PostMapping("update_emp")
     @ResponseBody
     public ResponseData updateEmp(Emp emp, Integer userId) {
@@ -157,6 +228,13 @@ public class EmpController {
         return ResponseData.SUCCESS(rows);
     }
 
+    /**
+     * 修改密码
+     * @param oldPassword
+     * @param newPassword
+     * @param empId
+     * @return
+     */
     @PostMapping("modify_pwd")
     @ResponseBody
     public ResponseData modifyPwd(@RequestParam String oldPassword, @RequestParam String newPassword, @RequestParam Integer empId) {
@@ -174,6 +252,11 @@ public class EmpController {
     }
 
 
+    /**
+     * 删除员工
+     * @param empId
+     * @return
+     */
     @PostMapping("delete_emp")
     @ResponseBody
     public ResponseData deleteEmp(Integer empId) {
@@ -181,6 +264,12 @@ public class EmpController {
         return ResponseData.SUCCESS(rows);
     }
 
+    /**
+     * 查找员工并跳转到员工详情页面
+     * @param empId
+     * @param model
+     * @return
+     */
     @GetMapping("emp_info")
     public String empInfo(Integer empId, Model model) {
         Emp emp = empService.selectOne(empId);

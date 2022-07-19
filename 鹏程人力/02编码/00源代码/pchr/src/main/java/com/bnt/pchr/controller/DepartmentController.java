@@ -22,6 +22,11 @@ public class DepartmentController  {
     @Qualifier("departmentService")
     private IDepartmentService departmentService;
 
+    /**
+     * 可选部门状态查询部门列表
+     * @param depState
+     * @return
+     */
     @PostMapping("select_list")
     @ResponseBody
     public ResponseData selectList(Integer depState){
@@ -29,6 +34,12 @@ public class DepartmentController  {
         return ResponseData.SUCCESS(depList);
     }
 
+    /**
+     * 查询部门并跳转到部门列表
+     * @param depState
+     * @param model
+     * @return
+     */
     @PostMapping("to_select")
     public String toSelect(Integer depState,Model model){
         List<Department> depList = departmentService.selectList(depState);
@@ -36,6 +47,11 @@ public class DepartmentController  {
         return "dep/dep_list";
     }
 
+    /**
+     * 根据id查询部门
+     * @param depId
+     * @return
+     */
     @PostMapping("select_one")
     @ResponseBody
     public ResponseData selectOne(Integer depId){
@@ -43,6 +59,12 @@ public class DepartmentController  {
         return ResponseData.SUCCESS(dep);
     }
 
+    /**
+     * 创建一个部门
+     * @param dep
+     * @param userId
+     * @return
+     */
     @PostMapping("create_dep")
     @ResponseBody
     public ResponseData createDep(Department dep,Integer userId){
@@ -55,6 +77,12 @@ public class DepartmentController  {
         return ResponseData.SUCCESS(rows);
     }
 
+    /**
+     * 修改一个部门
+     * @param dep
+     * @param userId
+     * @return
+     */
     @PostMapping("update_dep")
     @ResponseBody
     public ResponseData updateDep(Department dep,Integer userId){
@@ -67,6 +95,11 @@ public class DepartmentController  {
         return ResponseData.SUCCESS(rows);
     }
 
+    /**
+     * 删除一个部门
+     * @param depId
+     * @return
+     */
     @PostMapping("delete_dep")
     @ResponseBody
     public ResponseData deleteDep(Integer depId){

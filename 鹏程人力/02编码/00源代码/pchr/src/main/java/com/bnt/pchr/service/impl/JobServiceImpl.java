@@ -19,6 +19,11 @@ public class JobServiceImpl implements IJobService {
     @Qualifier("jobMapper")
     private JobMapper jobMapper;
 
+    /**
+     * 查询职位列表
+     * @param jobState
+     * @return
+     */
     @Override
     public List<Job> selectList(Integer jobState){
         QueryWrapper<Job> qw = new QueryWrapper<>();
@@ -28,6 +33,11 @@ public class JobServiceImpl implements IJobService {
         return jobMapper.selectList(qw);
     }
 
+    /**
+     * 根据id查询职位
+     * @param jobId
+     * @return
+     */
     @Override
     public Job selectOne(Integer jobId) {
         QueryWrapper<Job> qw = new QueryWrapper<>();
@@ -35,23 +45,44 @@ public class JobServiceImpl implements IJobService {
         return jobMapper.selectOne(qw);
     }
 
+    /**
+     * 删除职位
+     * @param jobId
+     * @return
+     */
     @Override
     public int deleteById(Integer jobId) {
     return jobMapper.deleteById(jobId);
     }
 
+    /**
+     * 增加职位
+     * @param  job
+     * @return
+     */
     @Override
     public int insert(Job job) {
         job.setCreateTime(new Date());
         return jobMapper.insert(job);
     }
 
+    /**
+     * 修改职位
+     * @param job
+     * @return
+     */
     @Override
     public int updateById(Job job) {
         job.setModifyTime(new Date());
         return jobMapper.updateById(job);
     }
 
+    /**
+     * 查重
+     * @param jobNo
+     * @param jobId
+     * @return
+     */
     @Override
     public int check(String jobNo,Integer jobId) {
         QueryWrapper<Job> qw = new QueryWrapper<>();
