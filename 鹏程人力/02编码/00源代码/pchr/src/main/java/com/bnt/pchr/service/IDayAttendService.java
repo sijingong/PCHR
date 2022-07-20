@@ -26,15 +26,14 @@ public interface IDayAttendService {
     * @return
     */
     PageData<DayAttend> selectPage(PageData<DayAttend> page);
-    
-   /**
-    * 根据ID查询返回一个打卡记录
-    * 查看该时间是否已经打卡
-    *
-    * @param attendId
-    * @return
-    */
-    DayAttend selectOne(Integer attendId);
+
+    /**
+     * 根据员工id和打卡时间获取打卡状态
+     * @param empId
+     * @param times
+     * @return
+     */
+    int selectOne(int empId,String times);
 
     /**
      * 查询已经打卡的列表

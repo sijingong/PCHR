@@ -51,8 +51,25 @@ public class DayAttendServiceImpl implements IDayAttendService {
     }
 
     @Override
-    public DayAttend selectOne(Integer attendId) {
-        return dayAttendMapper.selectById(attendId);
+    public int selectOne(int empId, String times) {
+        QueryWrapper<DayAttend> wrapper=new QueryWrapper<>();
+        wrapper.eq("emp_id",empId);
+        List<DayAttend> dayAttendList=dayAttendMapper.selectList(wrapper);//查询出员工打卡记录表
+        long time=Long.getLong(times);//获取当前时间的毫秒数
+        Integer state=null;//员工打卡状态
+        for (DayAttend day:dayAttendList){
+            Long attendTime=day.getAttendTime().getTime();//获取打卡开始时间
+            Long endTime=day.getEndTime().getTime();//获取下班打卡时间
+            if(attendTime==null){//当前并未打卡
+                state=-2;
+            }//已打上班卡但并未打下班卡
+            if(attendTime!=null&&endTime==null&&(time-attendTime)<4*60*60*60*1000){
+               state=day.getAttendState();//获取当前应打卡的状态
+            }else if(attendTime!=null&&endTime!=null){//都已经打卡
+                return 6;
+            }
+        }
+        return state;
     }
 
     @Override
