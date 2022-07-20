@@ -9,6 +9,7 @@ import com.bnt.pchr.mapper.EmpMapper;
 import com.bnt.pchr.service.IEmpService;
 
 import java.util.Date;
+import java.util.List;
 
 @Service("empService")
 public class EmpServiceImpl implements IEmpService {
@@ -27,6 +28,15 @@ public class EmpServiceImpl implements IEmpService {
     @Override
     public PageData<Emp> selectPage(PageData<Emp> pageData){
         return empMapper.selectPage(pageData);
+    }
+
+    /**
+     * 查询员工列表
+     * @return
+     */
+    @Override
+    public List<Emp> selectList(){
+        return empMapper.selectList(new QueryWrapper<Emp>());
     }
 
     /**

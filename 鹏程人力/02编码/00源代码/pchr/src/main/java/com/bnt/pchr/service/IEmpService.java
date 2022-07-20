@@ -1,7 +1,10 @@
 package com.bnt.pchr.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.bnt.pchr.commons.vo.PageData;
 import com.bnt.pchr.entity.Emp;
+
+import java.util.List;
 
 
 /**
@@ -16,6 +19,8 @@ public interface IEmpService {
     * @return
     */
    PageData<Emp> selectPage(PageData<Emp> pageData);
+
+    List<Emp> selectList();
 
     /**
      * 根据员工编号查询返回一个对象
