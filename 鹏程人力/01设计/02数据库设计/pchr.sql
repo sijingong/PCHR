@@ -215,7 +215,8 @@ CREATE TABLE `notice_emp`  (
 DROP TABLE IF EXISTS `contract_template`;
 CREATE TABLE `contract_template`  (
   `temp_id` int NOT NULL AUTO_INCREMENT COMMENT '模板ID',
-  `temp_file_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '模板文件路径',
+  `temp_name`  varchar(100) COMMENT '模板名称',
+  `temp_file_path` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '模板文件路径',
   `temp_type` int NULL DEFAULT NULL COMMENT '模板类型(1:试用期;2:正式;3:终身;4:临时)',
   `temp_state` int NULL DEFAULT NULL COMMENT '模板状态(1:未使用;2:使用中;3:已停用)',
   `create_time` datetime NULL DEFAULT NULL COMMENT '创建时间',
