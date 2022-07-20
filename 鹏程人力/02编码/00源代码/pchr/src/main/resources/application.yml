@@ -21,7 +21,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     username: root
-    password: 123456
+    password: bntabc@123
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/pchr?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useUnicode=true&useSSL=false&allowPublicKeyRetrieval=true
   servlet:
@@ -29,7 +29,7 @@ spring:
       enabled: true
       max-file-size: 100MB
       max-request-size: 101MB
-      location: d:\temp
+      location: d:\emp
       file-size-threshold: 10MB
   redis:
     password: 123456
@@ -43,10 +43,23 @@ spring:
         max-wait: -1
 mybatis-plus:
   mapper-locations: classpath:/mapper/*.xml
-  type-aliases-package: com.bnt.hrms.entity
+  type-aliases-package: com.bnt.pchr.entity
 logging:
   charset:
     console: UTF-8
     file: UTF-8
   level:
-    com.bnt.hrms: debug
+    com.bnt.pchr: debug
+config:
+  resume:
+    upload-dir: d:\emp\resume
+    server-path: http://192.168.0.103:8089/pchr/resume
+  contract:
+    template:
+      upload-dir: d:\emp\contract\template
+      server-path: http://192.168.0.103:8089/pchr/contract/template
+    upload-dir: d:\emp\contract
+    server-path: http://192.168.0.103:8089/pchr/contract
+  rescouce:
+    # docx、doc、pdf文件在线预览接口
+    online-preview: http://192.168.0.103:8012/onlinePreview?url=

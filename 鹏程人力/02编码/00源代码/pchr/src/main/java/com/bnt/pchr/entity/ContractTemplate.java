@@ -15,17 +15,17 @@ import org.apache.ibatis.type.Alias;
 import java.io.Serializable;
 import java.util.Date;
 /**
-* Author bnt
-* Date  2022-07-13 16:05:23
-*/
+ * Author bnt
+ * Date  2022-07-13 16:05:23
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
 @Alias("resumeTemplate")
 @ApiModel(value = "合同模板表")
-@TableName(value = "resume_template")
-public class ResumeTemplate implements Serializable {
+@TableName(value = "contract_template")
+public class ContractTemplate implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -34,9 +34,14 @@ public class ResumeTemplate implements Serializable {
     @TableId(type = IdType.AUTO)
     private Integer tempId;
 
-    @ApiModelProperty(value = "模板文件路径")
-    @TableField(value = "temp_file_id")
-    private String tempFileId;
+
+    @ApiModelProperty(value = "模板名称")
+    @TableField(value = "temp_name")
+    private String tempName;
+
+    @ApiModelProperty(value = "模板文件相对路径")
+    @TableField(value = "temp_file_path")
+    private String tempFilePath;
 
     @ApiModelProperty(value = "模板类型(1:试用期;2:正式;3:终身;4:临时)")
     @TableField(value = "temp_type")

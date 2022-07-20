@@ -12,4 +12,10 @@ import com.bnt.pchr.entity.Emp;
 @Mapper
 public interface EmpMapper extends BaseMapper<Emp> {
     PageData<Emp> selectPage(PageData<Emp> pageData);
+    /**
+     * 查询员工简历
+     * @param pageData
+     * @return
+     */
+    PageData<Emp> selectEmpResume(PageData<Emp> pageData);
 }

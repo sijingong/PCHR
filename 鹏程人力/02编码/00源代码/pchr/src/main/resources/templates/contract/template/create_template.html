@@ -1,0 +1,96 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="close" data-dismiss="modal">
+                <span aria-hidden="true">&times;</span> <span class="sr-only">Close</span>
+            </div>
+            <h4 class="modal-title">创建合同模板</h4>
+        </div>
+        <div class="modal-body" id="modalBody" roller="false"
+             style="width: 90%; position: relative; overflow-x: hidden; overflow-y: auto;margin-left: auto;margin-right: auto;">
+            <form action="#" method="post" id="createTempForm">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <span style="color: red">提示:请先填写合同模板名称后,再上传合同模板文件</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2">模板名称:</label>
+                        <div class="col-md-4">
+                            <input type="text" name="tempName" class="form-control"/>
+                        </div>
+                        <div class="col-md-1">
+                            <span style="color: red">*</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2">模板类型:</label>
+                        <div class="col-md-4">
+                            <select class="form-control" name="tempType">
+                                <option value="1">试用合同模板</option>
+                                <option value="2">正式合同模板</option>
+                                <option value="3">终身合同模板</option>
+                                <option value="4">临时合同模板</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <span style="color: red">*</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="control-label col-md-2">模板状态:</label>
+                        <div class="col-md-4">
+                            <select id="tempStateSelect" class="form-control" name="tempState">
+                                <option value="1">未使用</option>
+                                <option value="2">使用中</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <span style="color: red">*</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <button id="uploadBut" type="button" class="btn btn-primary">上传合同模板</button>
+                        </div>
+                        <div class="col-md-10" id="uploadControlDiv">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <!--合同模板文件URL-->
+                    <input type="hidden" id="tempFilePath" name="tempFilePath">
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <div>
+                <input id="tempFiles" type="file" name="temp_files" accept="application/pdf,application/msword"
+                       style="display: none">
+            </div>
+            <div class="btn btn-default" data-dismiss="modal" id="dialog">关闭</div>
+            <button type="button" class="btn btn-primary" id="submit_button" onclick="createTemp()">
+                <span>添加合同模板</span>
+            </button>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $('#uploadBut').click(function () {
+            $('#tempFiles').click();
+        });
+        $('#tempFiles').change(function () {
+            uploadTempFile();
+        });
+    });
+</script>

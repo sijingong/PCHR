@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:include="common/public::head('合同模板列表')">
+    <meta charset="UTF-8">
+    <title>合同模板列表</title>
+</head>
+<body>
+<ol class="breadcrumb">
+    <li>当前位置:合同模板列表</li>
+</ol>
+<div class="container-fluid" style="padding-left: 0px;">
+    <div class="well">
+        <form action="/contract/template/page_list" method="post">
+            <div class="form-group" style="width: 100%">
+                <div class="row">
+                    <div class="col-md-1">
+                        <span>类型:</span>
+                    </div>
+                    <div class="col-md-3">
+                        <select id="tempTypeSelect" class="form-control" name="tempType">
+                            <option value="0">--------全部--------</option>
+                            <option value="1">试用合同模板</option>
+                            <option value="2">正式合同模板</option>
+                            <option value="3">终身合同模板</option>
+                            <option value="4">临时合同模板</option>
+                        </select>
+                    </div>
+                    <div class="col-md-1 col-md-offset-1">
+                        <span>状态:</span>
+                    </div>
+                    <div class="col-md-3">
+                        <select id="tempStateSelect" class="form-control" name="tempState">
+                            <option value="0">--------全部--------</option>
+                            <option value="1">未使用</option>
+                            <option value="2">使用中</option>
+                            <option value="3">已停用</option>
+                        </select>
+                    </div>
+                    <div>
+                        <script th:inline="javascript">
+                            let tempState = [[${param.tempState!=null?param.tempState[0]:0}]];
+                            $('#tempStateSelect').val(tempState);
+                            let tempType = [[${param.tempType!=null?param.tempType[0]:0}]];
+                            $('#tempTypeSelect').val(tempType);
+                        </script>
+                        <div th:replace="common/public::page(10)"></div>
+                        <button type="submit" class="btn btn-primary" title="查询模板">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </button>
+                        <button type="button" class="btn bg-primary " onclick="showCreateTempDialog()" title="创建模板">
+                            <span class="glyphicon glyphicon glyphicon-plus"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div th:if="${pageData==null}"></div>
+<div th:unless="${pageData==null}">
+    <table class="table table-hover table-striped table-bordered">
+        <thead>
+        <tr class="info">
+        <tr>
+            <th class="text-center">序号</th>
+            <th class="text-center">名称</th>
+            <th class="text-center">类型</th>
+            <th class="text-center">状态</th>
+            <th>操作</th>
+        </tr>
+        </tr>
+        </thead>
+        <tbody th:if="${#lists.isEmpty(pageData.records)}">
+        <tr>
+            <td style="color: #0000ff;text-align: center" colspan="5">未查询到任何合同模板信息</td>
+        </tr>
+        </tbody>
+        <tbody th:unless="${#lists.isEmpty(pageData.records)}" th:each="temp,v:${pageData.records}">
+        <tr>
+            <td th:text="${v.count}"></td>
+            <td>
+                <span th:data-id="${temp.tempId}"  class="temp-name-span" onclick="viewTemp(this)">
+                    <img src="/static/img/pdf_icon.png" title="预览"/>
+                    <span th:text="${temp.tempName+'.pdf'}"></span>
+                </span>
+            </td>
+            <td th:switch="${temp.tempType}">
+                <span th:case="1">试用合同模板</span>
+                <span th:case="2">转正合同模板</span>
+                <span th:case="3">终身合同模板</span>
+                <span th:case="4">临时合同模板</span>
+                <span th:case="*" style="color: red">未知模板类型</span>
+            </td>
+            <td th:switch="${temp.tempState}">
+                <span th:case="1">未使用</span>
+                <span th:case="2">使用中</span>
+                <span th:case="3">已停用</span>
+                <span th:case="*" style="color: red">未知状态</span>
+            </td>
+
+            <td th:data-id="${temp.tempId}" th:data-name="${temp.tempName}">
+                <button  type="button" class="btn btn-warning btn-sm" title="删除模板" onclick="removeTemp(this)">
+                    <span class="glyphicon glyphicon-remove"></span>
+                </button>
+                <button  type="button" class="btn btn-primary btn-sm" title="修改模板" onclick="showModifyTempDialog(this)">
+                    <span class="glyphicon glyphicon-edit"></span>
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div th:unless="${#lists.isEmpty(pageData.records)}">
+        <style>
+            .temp-remove {
+                margin-left: 20px;
+                font-size: 18px;
+                cursor: pointer;
+            }
+
+            .temp-name-span {
+                cursor: pointer;
+            }
+
+            .temp-name-span img {
+                width: 50px;
+            }
+
+            .temp-name-span:hover {
+                font-size: 18px;
+            }
+
+            .temp-name-span:hover img {
+                width: 64px;
+            }
+        </style>
+        <script src="/static/js/common/pagination_plugs_1.0.js"></script>
+        <script src="/static/js/customer/contract/contract_template.js"></script>
+        <div style="text-align: center">
+            <ul class="pagination" style="margin-top: 0px!important;">
+
+            </ul>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="tempModal" tabindex="-1" temp="dialog" aria-labelledby="myModalLabel">
+        </div>
+        <script src="/static/js/common/base64.min.js"></script>
+        <script>
+            /**
+             * 合同模板在线预览
+             * @param url
+             */
+            function onlinePreview(url) {
+                console.info(url);
+                window.open('[[${application.onlinePreview}]]' + encodeURIComponent(Base64.encode(url)));
+            }
+
+            /**
+             * 预览合同模板
+             * @param span
+             */
+            function viewTemp(span) {
+                let tempId = $(span).data('id');
+                //获取合同模板URL
+                $.ajax({
+                    url: '/contract/template/get_url',
+                    type: 'GET',
+                    data: {'tempId': tempId},
+                    dataType: 'json',
+                    success: function (jsonData) {
+                        let status = jsonData.status;
+                        if (0 != status) {
+                            alert(`获取合同模板URL失败【${jsonData.message}】`);
+                            return;
+                        }
+                        let tempURL = jsonData.data;
+                        onlinePreview(tempURL);
+                    },
+                    error: function () {
+                        alert('获取合同模板URL失败');
+                    }
+                });
+            }
+
+            /**
+             * 删除合同模板
+             * @param but
+             */
+            function removeTemp(but) {
+                let tempName = $(but).parent().data('name');
+                if (!window.confirm(`确定要删除【${tempName}】吗?`)) {
+                    return;
+                }
+                let tempId = $(but).parent().data('id');
+                $.ajax({
+                    url: '/contract/template/remove',
+                    type: 'GET',
+                    data: {'temp_id': tempId},
+                    dataType: 'json',
+                    success: function (jsonData) {
+                        let status = jsonData.status;
+                        if (0 != status) {
+                            alert(`删除合同模板失败【${jsonData.message}】`);
+                            return;
+                        }
+                        let rows = jsonData.data;
+                        if (1 == rows) {
+                            alert(`删除【${tempName}】成功!`);
+                        } else if (0 == rows) {
+                            alert('合同模板不存在或已被删除');
+                        } else {
+                            alert('删除合同模板,服务器返回未知操作状态!');
+                        }
+                        window.location.reload();//刷新页面
+                    },
+                    error: function () {
+                        alert('删除合同模板失败');
+                    }
+                });
+            }
+
+            /**
+             *  打开添加合同模板模态框
+             *  @param but 按钮对象
+             */
+            function showCreateTempDialog(but) {
+                $.ajax({
+                    type: 'get',
+                    url: '/v/contract/template/create_template',
+                    dataType: 'html',
+                    success: function (data) {
+                        $("#tempModal").html(data);
+                        $("#tempModal").modal();
+                    },
+                    error: function () {
+                        alert('打开模态框失败!');
+                    }
+                });
+            }
+
+            /**
+             *  打开修改合同模板模态框
+             *  @param but 按钮对象
+             */
+            function showModifyTempDialog(but) {
+                let tempId = $(but).parent().data('id');
+                $.ajax({
+                    type: 'get',
+                    url: `/v/contract/template/modify_template?tempId=${tempId}`,
+                    dataType: 'html',
+                    success: function (data) {
+                        $("#tempModal").html(data);
+                        $("#tempModal").modal();
+                    },
+                    error: function () {
+                        alert('打开模态框失败!');
+                    }
+                });
+            }
+        </script>
+    </div>
+</div>
+</body>
+</html>

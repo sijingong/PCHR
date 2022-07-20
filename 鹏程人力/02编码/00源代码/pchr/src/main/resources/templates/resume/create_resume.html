@@ -11,22 +11,28 @@
             <form action="#" method="post" id="createResumeForm">
                 <div class="form-group">
                     <div class="row">
-                        <label class="control-label col-md-2">
-                            <button id="uploadBut" type="button" class="btn btn-primary">上传简历</button>
-                        </label>
-                        <div class="col-md-3">
-                            <button type="button" class="btn btn-success btn-sm" title="在线阅读">在线阅读</button>
-                            <button type="button" class="btn btn-warning btn-sm" title="删除简历">删除简历</button>
-                        </div>
-                        <div class="col-md-7">
-                            <div class="progress progress-striped active" style="display: none">
-                                <div class="progress">
-                                    <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0"
-                                         aria-valuemax="100"></div>
-                                </div>
-                            </div>
+                        <label class="control-label col-md-2">员工姓名:</label>
+                        <div class="col-md-2">
+                            <span id="empNameSpan" class="label label-info"></span>
                         </div>
                     </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <button id="uploadBut" type="button" class="btn btn-primary">上传简历</button>
+                        </div>
+                        <div class="col-md-10" id="uploadControlDiv">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <!--员工ID-->
+                    <input type="hidden" id="empId" name="empId">
+                    <!--简历文件URL-->
+                    <input type="hidden" id="resumeFilePath" name="resumeFilePath">
+                    <!--简历文件格式-->
+                    <input type="hidden" id="fileType" name="fileType">
                 </div>
             </form>
         </div>
@@ -62,75 +68,103 @@
             let file = files[0];
             let fileName = file.name;
             let fileNameFormat = /^\S+.(doc|docx|pdf)$/;
-            console.info(fileName);
-            console.info(fileNameFormat.test(fileName));
             if (!fileNameFormat.test(fileName)) {
                 alert("简历格式或文件类型不对【" + fileName + "】");
-                $(this)[0].files.length = 0;
+                $('#resumeFiles').val("");//清空上传文件
                 return false;
             }
             //利用jQuery AJAX异常上传简历文件
+            let empId = $('#empId').val()
             let formData = new FormData();
             formData.append('resume_files', file);
-            formData.append('emp_id', 1);
+            formData.append('emp_id', empId);
             $.ajax({
                 url: '/resume/upload',
                 type: "POST",
                 data: formData,
                 dataType: 'json',
                 processData: false,
+                async: false,
                 contentType: false,
-                xhr: function () { //这是关键 获取原生的xhr对象 做以前做的所有事情
-                    let xmlHttpRequest = jQuery.ajaxSettings.xhr();
-                    xmlHttpRequest.upload.onloadstart = function () {
-                        $('.progress').css({display: 'block'})
-                    }
-                    xmlHttpRequest.upload.onload = function () {
-                        //客户端上传数据完毕
-                        //$('.progress').css({display: 'none'});
-                    }
-                    xmlHttpRequest.upload.onprogress = function (ev) {
-                        if (ev.lengthComputable) {
-                            let percent = parseInt(100 * ev.loaded / ev.total);
-                            setProgressBar(percent);
-                        }
-                    }
-                    return xmlHttpRequest;
-                },
                 success: function (jsonData) {
-                    let status=jsonData.status;
-                    if(0!=jsonData.status)
-                    {
+                    let status = jsonData.status;
+                    if (0 != jsonData.status) {
                         alert(`上传简历失败【${jsonData.message}】`);
                         return;
                     }
-                    //成功
-                    //$('.progress').css({display: 'none'});//隐藏进度条
-                    $('#resumeFiles')[0].files.length = 0;//清空上传文件
+                    alert('上传简历成功!!!')
+                    let resume = jsonData.data;
+                    console.info(resume);
+                    $('#resumeFiles').val("");//清空上传文件
+                    let fileType = resume.fileType;
+                    if (1 == fileType) {
+                        $('#uploadControlDiv').append(`<span class="resume-name-span" onclick="onlinePreview('${resume.resumeURL}')"><img src="/static/img/docx_icon.png" title="预览">${resume.resumeName}</span>`);
+                    } else if (2 == fileType) {
+                        $('#uploadControlDiv').append(`<span class="resume-name-span" onclick="onlinePreview('${resume.resumeURL}')"><img src="/static/img/pdf_icon.png"  title="预览">${resume.resumeName}</span>`);
+                    } else {
+                        alert('未知的简历格式');
+                    }
+                    $('#uploadControlDiv').append(`<span class="glyphicon glyphicon-remove resume-remove" style="color: red;" title="删除简历" onclick="removeResume()"></span>`);
+                    $('#resumeFilePath').val(resume.resumeFilePath);
+                    $('#fileType').val(resume.fileType);
+                    //禁用上传按钮
+                    $('#uploadBut').attr("disabled", true)
                 }, error: function () {
-                    alert('上传文件失败');
+                    alert('上传简历失败');
                 }
             });
         });
     });
 
     /**
-     * 设置进度条
+     * 删除简历,即取消当前上传的简历
      */
-    function setProgressBar(percent) {
-        $('.progress-bar').css({width: percent + '%'});
-        $('.progress-bar').text(percent + '%');
-        $('.progress-bar').attr('aria-valuenow', percent);
+    function removeResume() {
+        if (!window.confirm('确定删除上传的简历码?')) {
+            return;
+        }
+        resetUploadForm();
+    }
+
+
+    /**
+     * 重置上传form表单信息
+     */
+    function resetUploadForm() {
+        $('#resumeFiles').val("");//清空上传文件
+        $('#uploadControlDiv').html('');
+        $('#resumeFilePath').val('');
+        $('#fileType').val('');
+        $('#uploadBut').attr("disabled", false)
     }
 
     /**
      * 创建简历
      */
     function createResume() {
+        let empId = $('#empId').val();
+        if ('' == empId) {
+            alert('缺少员工ID');
+            return;
+        }
+        let resumeFilePath = $('#resumeFilePath').val();
+        if ('' == resumeFilePath) {
+            alert('缺少简历相对路径');
+            return;
+        }
+        let fileType = $('#fileType').val();
+        if ('' == fileType) {
+            alert('缺少简历格式类型');
+            return;
+        }
+        if (!(1 == fileType || 2 == fileType)) {
+            alert('简历格式类型错误');
+            return;
+        }
         if (!window.confirm('确定要添加简历吗?')) {
             return;
         }
-        var formData = $('#createResumeForm').serialize();
+        let formData = $('#createResumeForm').serialize();
         $.ajax({
             url: '/resume/create',
             type: 'post',
@@ -142,11 +176,11 @@
                     alert(`添加简历失败【${jsonData.message}】`);
                     return;
                 }
-                var rows = jsonData.data;
+                let rows = jsonData.data;
                 if (1 == rows) {
                     alert('添加简历成功!!');
                     //隐藏模态框
-                    $("#ResumeModal").hide();
+                    $("#resumeModal").hide();
                     window.location.reload();//刷新页面
                 } else {
                     alert('添加简历,服务器返回未知操作状态!');

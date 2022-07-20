@@ -69,4 +69,33 @@
             </if>
         </where>
     </select>
+    <!--分页查询员工简历 left join-->
+    <select id="selectEmpResume" resultType="emp">
+        select
+        e.`emp_id` as `empId`,
+        `emp_name` as `empName`,
+        `resume_id` as `resume.resumeId`,
+        d.`dep_id` as `dep.depId`,
+        `dep_name` as `dep.depName`,
+        `resume_file_path` as `resume.resumeFilePath`,
+        `file_type` as `resume.fileType`,
+        r.`emp_id` as `resume.empId`
+        from `emp` as e
+        left join `department` as d
+        on e.`dep_id`=d.`dep_id`
+        left join `emp_resume` as r
+        on e.`emp_id`=r.`emp_id`
+        <where>
+            <if test="@cn.hutool.core.util.StrUtil@isNotEmpty(criteriaMap.kd)">
+                and (
+                `emp_name` like '%${criteriaMap.kd}%'  or
+                `emp_no`   like '%${criteriaMap.kd}%'  or
+                `mobile`   like '%${criteriaMap.kd}%'  or
+                `email`    like '%${criteriaMap.kd}%'  or
+                `qq`       like '%${criteriaMap.kd}%'  or
+                `id_card`  like '%${criteriaMap.kd}%'
+                )
+            </if>
+        </where>
+    </select>
 </mapper>

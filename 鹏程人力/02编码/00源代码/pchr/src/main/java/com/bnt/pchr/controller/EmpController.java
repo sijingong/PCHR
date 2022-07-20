@@ -280,4 +280,21 @@ public class EmpController {
         model.addAttribute("emp", emp);
         return "emp/emp_info";
     }
+
+    /**
+     * 根据关键字分页查询员工简历
+     * @param kd
+     * @param pageData
+     * @param model
+     * @return
+     */
+    @PostMapping("resumes")
+    public String selectResumes(String kd, PageData<Emp> pageData,Model model){
+        pageData.addCriteria("kd",kd);
+        //设置查询标签
+        pageData.addCriteria("tag","resume");
+        pageData=empService.selectPage(pageData);
+        model.addAttribute("pageData",pageData);
+        return "/resume/resume_list";
+    }
 }

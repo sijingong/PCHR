@@ -27,7 +27,13 @@ public class EmpServiceImpl implements IEmpService {
      */
     @Override
     public PageData<Emp> selectPage(PageData<Emp> pageData){
-        return empMapper.selectPage(pageData);
+        String tag = (String) pageData.getCriteriaMap().get("tag");
+        if (tag != null && "resume".equals(tag)) {
+            //分页查询员工简历
+            return empMapper.selectEmpResume(pageData);
+        } else {
+            return empMapper.selectPage(pageData);
+        }
     }
 
     /**

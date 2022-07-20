@@ -10,7 +10,7 @@
 </ol>
 <div class="container-fluid" style="padding-left: 0px;">
     <div class="well">
-        <form action="/api/emp/resumes" method="post">
+        <form action="/emp/resumes" method="post">
             <div class="form-group" style="width: 100%">
                 <div class="row">
                     <div class="col-md-1">
@@ -25,8 +25,6 @@
                         <div th:replace="common/public::page(10)"></div>
                         <button type="submit" class="btn btn-primary" title="查询简历"><span
                                 class="glyphicon glyphicon-search"></span></button>
-                        <button type="button" class="btn btn-primary" title="创建简历" onclick="showAddResumeDialog()"><span
-                                class="glyphicon glyphicon-plus"></span></button>
                     </div>
                 </div>
             </div>
@@ -57,34 +55,152 @@
             <td th:text="${v.count}"></td>
             <td th:text="${emp.empName}"></td>
             <td th:text="${emp.dep==null?'-':emp.dep.depName}"></td>
-            <td th:text="${emp.resume==null?'未上传':emp.resume.resumeFilePath}">
+            <td th:if="${emp.resume==null||emp.resume.resumeFilePath==null}">
+                <span style="color: red">未上传</span>
             </td>
-            <td>
-                <button type="button" class="btn btn-danger btn-sm" title="删除简历">
+            <td th:unless="${emp.resume==null||emp.resume.resumeFilePath==null}" th:switch="${emp.resume.fileType}"
+                th:data-id="${emp.empId}">
+                <span th:case="1" class="resume-name-span" onclick="viewResume(this)"><img
+                        src="/static/img/docx_icon.png" title="预览"/><span
+                        th:text="${emp.empName+'个人简历.docx'}"></span></span>
+                <span th:case="2" class="resume-name-span" onclick="viewResume(this)"><img
+                        src="/static/img/pdf_icon.png" title="预览"/><span
+                        th:text="${emp.empName+'个人简历.pdf'}"></span></span>
+                <span th:case="*" style="color: red">简历格式错误</span>
+            </td>
+            <td th:data-id="${emp.empId}" th:data-name="${emp.empName}">
+                <button th:unless="${emp.resume==null||emp.resume.resumeFilePath==null}" type="button"
+                        class="btn btn-danger btn-sm" title="删除简历" onclick="removeResume(this)"
+                        th:data-id="${emp.resume.resumeId}">
                     <span class="glyphicon glyphicon-remove"></span>
                 </button>
-                <button type="button" class="btn bg-primary btn-sm" title="修改角色">
-                   <span class="glyphicon glyphicon-plus"></span>
+                <button th:if="${emp.resume==null||emp.resume.resumeFilePath==null}" type="button"
+                        class="btn bg-primary btn-sm" title="上传简历" onclick="showUploadResumeDialog(this)">
+                    <span class="glyphicon glyphicon-upload"></span>
                 </button>
             </td>
         </tr>
         </tbody>
     </table>
-    <div th:unless="${#lists.isEmpty(pageData.records)}" style="text-align: center">
-        <script src="/static/js/common/pagination_plugs_1.0.js"></script>
-        <ul class="pagination" style="margin-top: 0px!important;">
+    <div th:unless="${#lists.isEmpty(pageData.records)}">
+        <style>
+            .resume-remove {
+                margin-left: 20px;
+                font-size: 18px;
+                cursor: pointer;
+            }
 
-        </ul>
+            .resume-name-span {
+                cursor: pointer;
+            }
+
+            .resume-name-span img {
+                width: 50px;
+            }
+
+            .resume-name-span:hover {
+                font-size: 18px;
+            }
+
+            .resume-name-span:hover img {
+                width: 64px;
+            }
+        </style>
+        <script src="/static/js/common/pagination_plugs_1.0.js"></script>
+        <div style="text-align: center">
+            <ul class="pagination" style="margin-top: 0px!important;">
+
+            </ul>
+        </div>
         <!-- Modal -->
         <div class="modal fade" id="resumeModal" tabindex="-1" resume="dialog" aria-labelledby="myModalLabel">
         </div>
+        <script src="/static/js/common/base64.min.js"></script>
         <script>
             /**
-             *  打开添加简历模态框
+             * 简历在线预览
+             * @param url
              */
-            function showAddResumeDialog() {
+            function onlinePreview(url) {
+                window.open('[[${application.onlinePreview}]]' + encodeURIComponent(Base64.encode(url)));
+            }
+
+            /**
+             * 预览简历
+             * @param span
+             */
+            function viewResume(span) {
+                //员工ID
+                let empId = $(span).parent().data('id');
+                //获取简历URL
+                $.ajax({
+                    url: '/resume/get_url',
+                    type: 'GET',
+                    data: {'empId': empId},
+                    dataType: 'json',
+                    success: function (jsonData) {
+                        let status = jsonData.status;
+                        if (0 != status) {
+                            alert(`获取简历URL失败【${jsonData.message}】`);
+                            return;
+                        }
+                        let resumeURL = jsonData.data;
+                        onlinePreview(resumeURL);
+                    },
+                    error: function () {
+                        alert('获取简历URL失败');
+                    }
+                });
+            }
+
+            /**
+             * 删除简历
+             * @param but
+             */
+            function removeResume(but) {
+                let resumeName = $(but).parent().prev().find('span').find('span').text();
+                if (!window.confirm(`确定要删除【${resumeName}】吗?`)) {
+                    return;
+                }
+                let resumeId = $(but).data('id');
+                $.ajax({
+                    url: '/resume/remove',
+                    type: 'GET',
+                    data: {'resume_id': resumeId},
+                    dataType: 'json',
+                    success: function (jsonData) {
+                        let status = jsonData.status;
+                        if (0 != status) {
+                            alert(`删除简历失败【${jsonData.message}】`);
+                            return;
+                        }
+                        let rows = jsonData.data;
+                        if (1 == rows) {
+                            alert('删除成功');
+                        } else if (0 == rows) {
+                            alert('简历不存在或已被删除');
+                        } else {
+                            alert('删除简历,服务器返回未知操作状态!');
+                        }
+                        window.location.reload();//刷新页面
+                    },
+                    error: function () {
+                        alert('删除简历失败');
+                    }
+                });
+            }
+
+            /**
+             *  打开添加简历模态框
+             *  @param but 按钮对象
+             */
+            function showUploadResumeDialog(but) {
+                let empId = $(but).parent().data('id');
+                let empName = $(but).parent().data('name');
                 if (1 == $(".modal-dialog").length) {
                     //如果已打开过模态框,直接显示
+                    $('#empId').val(empId);
+                    $('#empNameSpan').text(empName);
                     $("#resumeModal").modal();
                     return;
                 }
@@ -94,12 +210,24 @@
                     dataType: 'html',
                     success: function (data) {
                         $("#resumeModal").html(data);
+                        $('#empId').val(empId);
+                        $('#empNameSpan').text(empName);
                         $("#resumeModal").modal();
                     },
                     error: function () {
+                        alert('打开模态框失败!');
                     }
                 });
             }
+
+            $(function () {
+                $('#resumeModal').on('hidden.bs.modal', function () {
+                    //当关闭模态框时,还原模态框信息
+                    resetUploadForm();
+                    $('#empId').val('');
+                    $('#empNameSpan').text('');
+                });
+            });
         </script>
     </div>
 </div>

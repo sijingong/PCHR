@@ -187,6 +187,12 @@ public final class FileUtils {
         return imgNameList;
     }
 
+    /**
+     * 判断是否为图片
+     *
+     * @param imgName
+     * @return
+     */
     public final static boolean isImgFile(String imgName) {
         imgName = imgName.toLowerCase();
         Pattern p = Pattern
@@ -194,11 +200,30 @@ public final class FileUtils {
         return p.matcher(imgName).matches();
     }
 
-    public static boolean isVideoFile(String imgName) {
-        imgName = imgName.toLowerCase();
+    /**
+     * 判断是否为视频文件
+     *
+     * @param videoFileName
+     * @return
+     */
+    public static boolean isVideoFile(String videoFileName) {
+        videoFileName = videoFileName.toLowerCase();
         Pattern p = Pattern
                 .compile("[^\\/\\.<>|\":]+\\.(mp4|ogg|m4v|3gpp|mpeg|mov|mkv)$");
-        return p.matcher(imgName).matches();
+        return p.matcher(videoFileName).matches();
+    }
+
+    /**
+     * 判断文件是否为简历文件
+     *
+     * @param resumeFileName
+     * @return
+     */
+    public static boolean isResumeFile(String resumeFileName) {
+        resumeFileName = resumeFileName.toLowerCase();
+        Pattern p = Pattern
+                .compile("[^\\/\\.<>|\":]+\\.(doc|docx|pdf)$");
+        return p.matcher(resumeFileName).matches();
     }
 
     /**
