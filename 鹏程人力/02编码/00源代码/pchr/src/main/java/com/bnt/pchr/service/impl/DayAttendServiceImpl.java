@@ -55,7 +55,7 @@ public class DayAttendServiceImpl implements IDayAttendService {
         QueryWrapper<DayAttend> wrapper=new QueryWrapper<>();
         wrapper.eq("emp_id",empId);
         List<DayAttend> dayAttendList=dayAttendMapper.selectList(wrapper);//查询出员工打卡记录表
-        long time=Long.getLong(times);//获取当前时间的毫秒数
+        long time=Long.parseLong(times);//获取当前时间的毫秒数
         Integer state=null;//员工打卡状态
         for (DayAttend day:dayAttendList){
             Long attendTime=day.getAttendTime().getTime();//获取打卡开始时间
@@ -137,7 +137,6 @@ public class DayAttendServiceImpl implements IDayAttendService {
         long startTime = calendar.getTimeInMillis();//上班
         long endTime = c.getTimeInMillis();//下班
         long overTime = cal.getTimeInMillis();//超时
-        System.out.println("当前" + time + ",上班" + startTime + ",下班" + endTime + ",超时" + overTime);
         if (attendTime == null) {//未打上班卡
             if (time > overTime && time < endTime) {//设置超时状态
                 dayAttend.setAttendState(5);
@@ -178,13 +177,22 @@ public class DayAttendServiceImpl implements IDayAttendService {
     }
 
     @Override
+    public int queryCompensateCount(DayAttend dayAttend) {
+        int empId = dayAttend.getEmpId();
+        QueryWrapper<DayAttend> qw = new QueryWrapper<>();
+        qw.eq("emp_id", empId);
+        qw.eq("attend_state", 4);//查询状态为补卡的次数
+        return dayAttendMapper.selectCount(qw).intValue();
+    }
+
+    @Override
     public int compensateCard(DayAttend dayAttend) {
         int empId = dayAttend.getEmpId();
         QueryWrapper<DayAttend> qw = new QueryWrapper<>();
         qw.eq("emp_id", empId);
         qw.eq("attend_state", 4);//查询状态为补卡的次数
         int count = dayAttendMapper.selectCount(qw).intValue();
-        if (count > 2) {
+        if (count > 3) {
             //补卡次数超过3次
             return 9;
         }

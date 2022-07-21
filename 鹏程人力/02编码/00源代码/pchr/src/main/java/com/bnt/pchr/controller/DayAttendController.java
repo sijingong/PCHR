@@ -3,6 +3,12 @@ package com.bnt.pchr.controller;
 import com.bnt.pchr.commons.vo.PageData;
 import com.bnt.pchr.commons.vo.ResponseData;
 import com.bnt.pchr.entity.DayAttend;
+import com.bnt.pchr.entity.Department;
+import com.bnt.pchr.entity.Emp;
+import com.bnt.pchr.entity.Job;
+import com.bnt.pchr.service.IDepartmentService;
+import com.bnt.pchr.service.IEmpService;
+import com.bnt.pchr.service.IJobService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +29,18 @@ public class DayAttendController {
     @Autowired
     @Qualifier("dayAttendService")
     private IDayAttendService dayAttendService;
+
+    @Autowired
+    @Qualifier("empService")
+    private IEmpService empService;
+
+    @Autowired
+    @Qualifier("jobService")
+    private IJobService jobService;
+
+    @Autowired
+    @Qualifier("departmentService")
+    private IDepartmentService departmentService;
 
     /**
      * 创建上下班打卡记录
@@ -75,6 +93,26 @@ public class DayAttendController {
     }
 
     /**
+     * 查询补卡次数和员工数据
+     *
+     * @param dayAttend
+     * @return
+     */
+    @RequestMapping("query_count")
+    public ModelAndView queryCompensateCount(DayAttend dayAttend, ModelAndView mv) {
+        int rows = dayAttendService.queryCompensateCount(dayAttend);
+        Emp emp = empService.selectOne(dayAttend.getEmpId());
+        Job job = jobService.selectOne(emp.getJobId());
+        emp.setJob(job);
+        Department dep = departmentService.selectOne(emp.getDepId());
+        emp.setDep(dep);
+        mv.addObject("emp", emp);
+        mv.addObject("rows", rows);
+        mv.setViewName("/dayAttend/compensate_card");
+        return mv;
+    }
+
+    /**
      * 查询打卡记录
      *
      * @param kd          关键字检索
@@ -109,7 +147,7 @@ public class DayAttendController {
      * @param times
      * @return
      */
-    @GetMapping("select_one")
+    @PostMapping("select_one")
     @ResponseBody
     public ResponseData selectOne(int empId, String times) {
         int rows = dayAttendService.selectOne(empId, times);
@@ -125,7 +163,7 @@ public class DayAttendController {
                 return ResponseData.FAIL(100301, "您无法在下班后进行打卡!");
             } else if (9 == row) {
                 return ResponseData.FAIL(100302, "未到下班打卡时间，不可以重复打卡");
-            }else {//添加成功
+            } else {//添加成功
                 return ResponseData.SUCCESS(2);
             }
         }

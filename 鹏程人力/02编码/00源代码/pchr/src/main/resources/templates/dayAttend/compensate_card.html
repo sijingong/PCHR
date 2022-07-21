@@ -8,25 +8,81 @@
 <ol class="breadcrumb">
     <li>当前位置:补卡界面</li>
 </ol>
-<div class="container-fluid" style="padding: 0px">
-    <div class="well">
-        <table>
-            <thead>
-            <tr>
-                <th class="text-center">员工姓名</th>
-                <th class="text-center">员工编号</th>
-                <th class="text-center">所属部门</th>
-                <th class="text-center">已补卡次数</th>
-                <th class="text-center">操作</th>
-            </tr>
-            </thead>
-            <tbody th:if="${}">
-            <tr>
-                <td style="color: #2a3e93;text-align: center" colspan="5">未查询到员工数据</td>
-            </tr>
-            </tbody>
-        </table>
+<div th:if="${rows==null}">未获取到员工id或打卡状态参数!</div>
+<div th:unless="${rows}==null">
+    <div class="container-fluid" style="padding: 0px">
+        <div class="well">
+            <table>
+                <thead>
+                <tr class="info">
+                    <th class="text-center">员工姓名</th>
+                    <th class="text-center">员工编号</th>
+                    <th class="text-center">所属部门</th>
+                    <th class="text-center">已补卡次数</th>
+                    <th class="text-center">操作</th>
+                </tr>
+                </thead>
+                <tbody th:if="${#lists.isEmpty(emp)}">
+                <tr>
+                    <td style="color: #2a3e93;text-align: center" colspan="5">未查询到员工数据</td>
+                </tr>
+                </tbody>
+                <tbody th:unless="${ #lists.isEmpty(emp)}">
+                <tr>
+                    <td th:text="${emp.empName}"></td>
+                    <td th:text="${emp.empNo}"></td>
+                    <td th:text="${emp.dep==null?'-':emp.dep.depName}"></td>
+                    <td th:text="${rows}"></td>
+                    <td th:data-id="${emp.empId}" th:data-name="${emp.empName}">
+                        <button type="button" class="btn bg-primary btn-sm" title="补卡" style="align-content: center"
+                                onclick="compensate(this)">
+                            <span class="glyphicon glyphicon-leaf">&nbsp;补卡&nbsp;</span>
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
+<script>
+    /**
+     * 点击进行补卡
+     */
+    function compensate(but) {
+        var empId = $(but).parent().data("id");
+        var empName = $(but).parent().data("name");
+        console.info(empName);
+        if (!window.confirm(`您确定要对员工【${empName}】进行补卡吗?`)) {
+            return;
+        }
+        $.ajax({
+            url: '/dayAttend/compensate',
+            type: 'post',
+            data: {empId: empId},
+            cache: false,
+            dataType: 'json',
+            success: function (jsonData) {
+                var status = jsonData.status;
+                if (status != 0) {
+                    alert('补卡失败!服务器异常');
+                }
+                var rows = jsonData.data;
+                if ($.isEmptyObject(rows)) {
+                    alert('补卡数据未加载!');
+                    return;
+                }
+                if (rows == 1) {
+                    alert('加载成功!');
+                    window.location.reload();
+                } else {
+                    alert(jsonData.message());
+                }
+            }, error: function () {
+                alert('加载失败,服务器返回未知的异常');
+            }
+        });
+    }
+</script>
 </body>
 </html>

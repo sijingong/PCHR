@@ -1,6 +1,6 @@
 <script src="/static/js/jquery-3.6.0.min.js"></script>
 <script>
-    function getTime(){
+    function getTime() {
         document.close();
         var date = new Date();
         var year = date.getFullYear();
@@ -9,16 +9,17 @@
         var hour = date.getHours();
         var minutes = date.getMinutes();
         var seconds = date.getSeconds();
-        nowTime = `${year}-${month.toString().padStart(2,0)}-${dayOfMonth.toString().padStart(2,0)} ${hour.toString().padStart(2,0)}:${minutes.toString().padStart(2,0)}:${seconds.toString().padStart(2,0)}`;
+        nowTime = `${year}-${month.toString().padStart(2, 0)}-${dayOfMonth.toString().padStart(2, 0)} ${hour.toString().padStart(2, 0)}:${minutes.toString().padStart(2, 0)}:${seconds.toString().padStart(2, 0)}`;
         $('#nTime').html(nowTime);
-        // document.write(`<span>当前时间为:${nowTime}</span>`);
     }
+
     window.setInterval('getTime()', 999);
+
     /**
      * 获取当前打卡时间
      */
-    function getNowTime(but) {
-        var attend = $(but).parent().data('下班打卡');
+    $(function getNowTime(but) {
+        //var attend = $(but).parent().data('下班打卡');
         var date = new Date();
         var year = date.getFullYear();
         var month = date.getMonth() + 1;
@@ -29,12 +30,12 @@
         nowTime = `${year}-${month}-${dayOfMonth} ${hour}:${minutes}:${seconds}`;//输出当前的时间节点
         //当前时间的毫秒数
         var times = new Date(year, month, dayOfMonth, hour, minutes, seconds).getTime();
-        date = new Date(Date.parse(nowTime.replace(/-/g, "/")));
-        var empId = $(but).parent().data('emp-id');
+        //date = new Date(Date.parse(nowTime.replace(/-/g, "/")));
+        var empId = [[${param.empId}]];
         if (times > new Date(year, month, dayOfMonth, 9, 0, 0).getTime() && times < new Date(year, month, dayOfMonth, 12, 0, 0).getTime()) {
-            document.write('<span>当前是上午上班时间</span>');
+            document.write('<span style="color: #1c77ac">当前是上午上班时间</span>');
         } else if (times > new Date(year, month, dayOfMonth, 12, 0, 0).getTime()) {
-            document.write('<span>您当前已不能打卡</span>');
+            document.write('<span style="color: #ab1e1e">您当前已不能打卡</span>');
         }
         $.ajax({
             url: '/dayAttend/select_one',
@@ -52,23 +53,37 @@
                     alert('打卡成功!');
                     window.location.reload();
                 } else {
-                    alert(jsonData.message());
+                    alert(jsonData.message);
                 }
             }, error: function () {
                 alert('打卡失败,服务器返回未知的错误!');
             }
         });
-    }
+    });
 </script>
+<style>
+    .button {
+        background-color: #4CAF50;
+        color: black;
+        border: 2px solid #4CAF50;
+        border-radius: 3px;
+    }
+    .button:hover {
+        background-color: #4CAF50;
+        color: white;
+    }
+</style>
 <form action="#" method="post">
     <div id="myForm">
-        <div th:data-emp-id="${empId}">
+        <div>
             <div id="div1">
-                <span id="nTime">当前时间:</span>
+                <span id="nTime" style="color: #2aabd2;">当前时间:</span>
             </div>
-            <button type="button" name="nowTime" class="btn btn-primary"
-                    onclick="getNowTime(this)">上班打卡
+            <div>
+            <button type="button" name="nowTime" class="button"
+                    onclick="getNowTime(this)">打&nbsp;&nbsp;卡
             </button>
+            </div>
         </div>
     </div>
 </form>

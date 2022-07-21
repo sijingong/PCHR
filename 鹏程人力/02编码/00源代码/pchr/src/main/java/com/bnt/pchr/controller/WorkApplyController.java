@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import com.bnt.pchr.service.IWorkApplyService;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.List;
 
 @Slf4j
 @RequestMapping("workApply")

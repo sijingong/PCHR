@@ -28,6 +28,13 @@ public interface IDayAttendService {
     PageData<DayAttend> selectPage(PageData<DayAttend> page);
 
     /**
+     * 查询补卡的次数
+     * @param dayAttend
+     * @return
+     */
+    int queryCompensateCount(DayAttend dayAttend);
+
+    /**
      * 根据员工id和打卡时间获取打卡状态
      * @param empId
      * @param times
